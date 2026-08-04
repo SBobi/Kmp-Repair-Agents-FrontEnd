@@ -145,7 +145,9 @@ Pipeline: renderer puro + Explanation Agent con fallback a plantilla.
 **Vista Explicación**: el artefacto renderizado (Markdown al lado del JSON), con los **cuatro
 campos de la auditoría del paper separados y etiquetados** — identifica la entidad reparada,
 conecta el patch con la evidencia, reporta validación por target, declara incertidumbre — para que
-un revisor humano los marque sin leer prosa buscándolos. Exporta el CSV de auditoría
+se puedan marcar sin leer prosa buscándolos (auditoría interna, la hacen los autores; sin
+revisores externos ni participantes — ver
+[evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)). Exporta el CSV de auditoría
 (`case_id` + 4 columnas sí/no).
 
 Cuando la narrativa vino del fallback determinista y no del agente, la vista lo indica.
@@ -178,8 +180,10 @@ Pipeline: `SqliteCaseCatalogSource` sobre `paper_corpus_v1.db` + corrida complet
 **Índice filtrable** de los 94 casos con su **estado de reparación** — que es literalmente el hueco
 que el front del Mining declaró fuera de alcance ("es el otro repo, y ese dato no existe todavía").
 Filtros multi-select con conteo, mismo patrón: repo, familia rota, target roto, `update_kind`, JDK,
-y los nuevos — estado final del caso y outcome de validación. Filtros en la URL, para compartir un
-subconjunto por enlace.
+y los nuevos — estado final del caso, outcome de validación y **licencia SPDX**, que el
+[ADR 0009](../../Kmp-Repair-Agents/docs/decisions/0009-generated-patches-carry-their-source-licence.md)
+exige como vista de primera clase y no como `grep` (20 de los 94 son GPL-3.0). Filtros en la URL,
+para compartir un subconjunto por enlace.
 
 El panel de cabecera debe hacer visible el **desbalance heredado del corpus**, no promediarlo: dos
 repos son el 37% de los casos, Android rompe ~4× más que iOS, y hay 2 casos iOS-solo. Está todo

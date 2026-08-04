@@ -51,7 +51,7 @@ Las seis secciones centrales son, una a una, las
 | `validation` | paso 7 | matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level |
 | `explanation` | paso 8 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si vino del agente o del fallback |
 | `agent_calls` | paso 5 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
-| `catalog_origin` | paso 10 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint` |
+| `catalog_origin` | paso 10 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` (`spdx`/`resolved_at`/`url`) y `base_commit_date` |
 
 ## Tres tipos de ausencia distintos
 
