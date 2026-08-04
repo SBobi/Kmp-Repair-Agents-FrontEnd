@@ -41,8 +41,9 @@ Pipeline: entidades del Case Bundle, `CaseState` con sus transiciones, las 5 cla
 
 **Vista Domain.** El grafo de estados dibujado **desde el dump, no a mano**: nodos y aristas tal
 como el dominio las declara, con los caminos de escape marcados (`NO_REPAIR_NEEDED`,
-`NO_SAFE_PATCH → EXPLAINED`). Al lado, la tabla de taxonomía con las 5 clases y un ejemplo de diff
-por clase.
+`NO_SAFE_PATCH → EXPLAINED`, y `UNAVAILABLE`, alcanzable desde cualquier nodo, con la arista de
+vuelta dibujada solo para los `reason` transitorios). Al lado, la tabla de taxonomía con sus 5
+clases y un ejemplo de diff por clase.
 
 *Probado:* que la máquina de estados **es la que se cree que es**. Un estado sin salida, una
 transición que se agregó sin declarar, o el `fallback` de taxonomía ausente se ven en un vistazo —
@@ -57,7 +58,10 @@ Primer `kmp-repair dump` real.
 el caso todavía no alcanzó se marcan **"no alcanzada"** con el estado que lo explica — nunca vacías
 ni omitidas en silencio. Dentro:
 
-- *Update*: `update_kind`, dependencia, versión origen→destino, los dos SHAs, y el diff del bot.
+- *Update*: la **lista de bumps** —cada uno con su `label`, versión origen→destino y su
+  `update_kind`—, los dos SHAs y el diff del bot. Es una lista aunque traiga un solo elemento, y
+  10 de los 94 casos traen entre 2 y 4: la vista los muestra todos, nunca solo el primero. Cuando
+  una fase posterior marcó el **bump primario**, se destaca; mientras siga `null` no se inventa uno.
 - *Execution*: la **rejilla target × stage** (base / updated), heredada del front del Mining con su
   misma semántica de glifos. Debajo, las `FailureObservation` tipadas con su rol causal
   (primary/cascade/preexisting/regression) — **incluido el texto de error real**, que es
@@ -117,8 +121,13 @@ para source-level + aplicador atómico.
 **Vista Intentos.** Uno por intento, en orden: la ruta elegida (source-level / build-level) y por
 qué, el **diff unificado** del patch (`DiffView` del Mining, con colapso para parches grandes),
 aceptado o rechazado **con el motivo del aplicador** (path fuera del workspace, hash de snapshot
-viejo, contexto de hunk que no casa, límite de tamaño, downgrade sin justificar). Y el contador de
-llamadas a LLM, con los reintentos de formato contabilizados **aparte** del budget experimental.
+viejo, contexto de hunk que no casa, límite de tamaño, downgrade). Y el contador de llamadas a LLM,
+con los reintentos de formato contabilizados **aparte** del budget experimental.
+
+La comprobación de downgrade tiene **tres** salidas y la vista las distingue: rechazado, OK, y
+`SKIPPED` con su motivo cuando no era comparable (un `reference-update` mueve shas, que no se
+ordenan). **`SKIPPED` no se dibuja como OK** — misma regla que `None` ≠ 0. Sobre el corpus el
+rechazo no dispara nunca (0 de 117 bumps), así que si aparece uno, es para mirarlo.
 
 *Probado:* `toolchain_case` debe resolverse con **0 llamadas a LLM** y eso se lee en pantalla. Si
 marca 1, la extracción determinista de versión mínima no está entrando y el ADR 0004 está roto en

@@ -5,7 +5,7 @@ y no se produce aquí.**
 
 ```bash
 # en ../Kmp-Repair-Agents
-kmp-repair dump <case-id> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
+kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
 kmp-repair dump --all    > ../Kmp-Repair-Agents-FrontEnd/data/bundles.json   # desde el paso 10
 ```
 
@@ -43,8 +43,10 @@ Las seis secciones centrales son, una a una, las
 | campo | presente desde | notas |
 |---|---|---|
 | `schema_version`, `generated_at`, `pipeline_git_sha` | paso 2 | procedencia; el sha permite trazar cualquier pantalla a una versión exacta del pipeline |
+| `case_key`, `resolved_key` | paso 2 | la llave tal como se pidió (`owner/name#pr` o `owner/name@base..head`) y la **resuelta**, siempre en forma `@base..head`. Las dos tienen que sobrevivir a una URL. Cuando difieren, la vista muestra a qué revisiones resolvió: un `#pr` no fija contenido y un PR reescrito resuelve distinto |
 | `case_state` | paso 2 | el estado terminal alcanzado — es lo que explica cada sección ausente |
-| `update` | paso 2 | `update_kind` (5 valores, incluido `fallback`), dependencia, `version_from`/`version_to`, `base_sha`/`head_sha`, diff del bot |
+| `blocked` | paso 2 | `null` salvo que `case_state` sea `UNAVAILABLE`; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
+| `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y 10 de los 94 casos traen entre 2 y 4. `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión". El bump primario es nullable y lo llena un paso posterior, nunca la ingesta |
 | `execution` | paso 2 | probes por target y stage, `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados |
 | `structural` | paso 4 | grafo de source-sets, pertenencia a targets, links expect/actual, y `partial: bool` |
 | `repair` | paso 4 (localización) / 6 (patches) | candidatos rankeados con desglose por señal; intentos de patch con diff, ruta y motivo de rechazo |

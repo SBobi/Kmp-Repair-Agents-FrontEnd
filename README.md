@@ -31,7 +31,7 @@ contrato del dump**, nunca lo rompe hacia atrás.
 Un comando del pipeline emite el artefacto; esta app lo importa:
 
 ```bash
-cd ../Kmp-Repair-Agents && kmp-repair dump <case-id> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
+cd ../Kmp-Repair-Agents && kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
 ```
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
