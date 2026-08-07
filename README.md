@@ -23,7 +23,7 @@ razonamiento completo está en
 [ADR 0008 del pipeline](../Kmp-Repair-Agents/docs/decisions/0008-every-step-verified-by-ui.md).
 
 Consecuencia práctica: esta app no espera a que exista el pipeline entero. En el paso 1 dibuja una
-máquina de estados; en el paso 7, una matriz de validación. Cada paso añade una vista y **amplía el
+máquina de estados; en el paso 8, una matriz de validación. Cada paso añade una vista y **amplía el
 contrato del dump**, nunca lo rompe hacia atrás.
 
 ## De dónde salen los datos

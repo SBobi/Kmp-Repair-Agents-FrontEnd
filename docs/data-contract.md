@@ -6,7 +6,7 @@ y no se produce aquí.**
 ```bash
 # en ../Kmp-Repair-Agents
 kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
-kmp-repair dump --all    > ../Kmp-Repair-Agents-FrontEnd/data/bundles.json   # desde el paso 10
+kmp-repair dump --all    > ../Kmp-Repair-Agents-FrontEnd/data/bundles.json   # desde el paso 11
 ```
 
 Todo lo que decide **qué contiene** un Case Bundle vive en el repo del pipeline:
@@ -32,10 +32,20 @@ rechaza en la frontera (`src/data.ts`), en vez de renderizarse mal en silencio.
 ## Estructura
 
 ```
-{ schema_version, generated_at, pipeline_git_sha, case_state,
+{ schema_version, generated_at, pipeline_git_sha,
+  case_key, resolved_key, case_state, blocked,
   update, execution, structural, repair, validation, explanation,
-  agent_calls, catalog_origin }
+  agent_calls, catalog_origin, licence, warning }
 ```
+
+Las seis del medio son **las seis secciones del Case Bundle y ninguna más** — `ui_evidence` cuelga
+de `execution`, no a su lado, porque es evidencia de §2 y el
+[ADR 0002](../../Kmp-Repair-Agents/docs/decisions/0002-case-bundle-six-sections.md) fija esas seis
+como la estructura organizadora del pipeline entero.
+
+**Este boceto es la lista de filas de la tabla de abajo, no una redacción paralela.** Se escribió
+una vez con doce campos y quedó atrás en cuanto la tabla creció debajo — la forma exacta del defecto
+A01. Si se añade una fila, se añade acá.
 
 Las seis secciones centrales son, una a una, las
 [6 etapas del Case Bundle](../../Kmp-Repair-Agents/docs/stages.md).
@@ -47,22 +57,34 @@ Las seis secciones centrales son, una a una, las
 | `case_state` | paso 2 | el estado terminal alcanzado — es lo que explica cada sección ausente |
 | `blocked` | paso 2 | `null` salvo que `case_state` sea `UNAVAILABLE`; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
 | `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y **10 de los 94** casos traen entre 2 y 4 (3 con dos, 5 con tres, 2 con cuatro). `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión", y **no es hipotética: son 4 de los 94** —`Oztechan/CCC#2807` y `#4332`, `meshtastic/Meshtastic-Android#5212` y `#5676`, los cuatro `reference-update`—, así que una vista probada solo con listas no vacías se rompe en el 4 % del corpus. El bump primario es nullable y lo llena un paso posterior, nunca la ingesta. Cifras medidas sobre `paper_corpus_v1.db` el 2026-08-06 |
-| `execution` | paso 2 | probes por target y stage, `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados |
-| `structural` | paso 4 | grafo de source-sets, pertenencia a targets, links expect/actual, y `partial: bool` |
-| `repair` | paso 4 (localización) / 6 (patches) | candidatos rankeados con desglose por señal; intentos de patch con diff, ruta y motivo de rechazo |
-| `validation` | paso 7 | matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level |
-| `explanation` | paso 8 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si vino del agente o del fallback |
-| `agent_calls` | paso 5 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
-| `catalog_origin` | paso 10 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
-| `licence` | paso 10 | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
-| `warning` | paso 6 | el aviso experimental **del parche generado** —`GeneratedPatch.warning`, que empieza *«Generated automatically by a research experiment…»*—, **renderizado tal cual llega** y nunca reescrito por la app. **No es el aviso del corpus**: `notice.experimental_use_only` habla de las reparaciones humanas minadas, y son dos sujetos distintos que el minado mantiene separados a propósito (A18/A30). Más `experimental_only: true` y `maintainer_reviewed: false` legibles por máquina, para que un script que consuma el dump llegue a la misma conclusión que quien lee la página |
+| `execution` | paso 2 | probes por target y stage **con su nivel** (`configuration`, `compile`, `compile-test`, `link`, `test-run`), `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados, hash del log crudo en el `ArtifactStore`, y la comparación contra los probes del catálogo |
+| `execution.ui_evidence` | paso 4 | `null` fuera de Android. Si no: `status` (`completed`/`blocked`/`skipped`), `blocked_reason`, el **piso de ruido** medido explorando la base dos veces, los diffs por pantalla y la cobertura por activity. **Columna aparte: no entra en ningún outcome ni en BSR/CTSR/FFSR** ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)) |
+| `structural` | paso 5 | **por archivo**: `impact_level` (0 no impactado / 1 transitivo / 2 directo), `propagated_from` (de qué archivo entró un transitivo), `rloc` (líneas reales) y `complexity_proxy`. Son los cuatro campos que alimentan sunburst, árbol de propagación y CodeCharta — **el `.cc.json` lo deriva el visor de aquí**, el pipeline no lo emite aparte: dos artefactos sobre el mismo caso pueden discrepar, y el que se mira sería el que nadie verifica. Más el `KmpProjectModel`: source-sets con `depends_on`/`targets`/`kind`, targets con su plataforma, links expect/actual, **`orphan_actuals[]`** (un `actual` sin su `expect` — suele significar que la actualización eliminó la declaración compartida), `extraction_layers[]` (con qué capas se construyó: sin Gradle vale menos), `structural_evidence[]` con `provenance` y `confidence`, y `partial: bool`. **`null` en un caso de build verde**: §3 es perezosa, así que un hallazgo de UI puede venir sin modelo estructural — y entonces se muestra **sin atribución a código**, nunca inventada |
+| `repair` | paso 5 (localización) / 7 (patches) | candidatos rankeados con desglose por señal; intentos de patch con diff, ruta y motivo de rechazo |
+| `validation` | paso 8 | matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level |
+| `explanation` | paso 9 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si vino del agente o del fallback |
+| `agent_calls` | paso 6 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
+| `catalog_origin` | paso 11 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
+| `licence` | paso 11 | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
+| `warning` | paso 7 | el aviso experimental **del parche generado** —`GeneratedPatch.warning`, que empieza *«Generated automatically by a research experiment…»*—, **renderizado tal cual llega** y nunca reescrito por la app. **No es el aviso del corpus**: `notice.experimental_use_only` habla de las reparaciones humanas minadas, y son dos sujetos distintos que el minado mantiene separados a propósito (A18/A30). Más `experimental_only: true` y `maintainer_reviewed: false` legibles por máquina, para que un script que consuma el dump llegue a la misma conclusión que quien lee la página |
 
-## Tres tipos de ausencia distintos
+## Cuatro tipos de ausencia distintos
 
 Distinguirlos es la única forma de que la UI no mienta:
 
+- **Target nunca planificado**: el repo no declara ese target, así que no hay fila. **No se pinta
+  `⊘`** — eso afirmaría «lo intentamos y la máquina no pudo», que es falso. Misma lección que el
+  centinela `no-kmp-targets` del minado, un nivel más abajo.
+- **Celda no alcanzada**: el target estaba planificado y una compuerta anterior falló. Es la
+  columna `updated` entera de los **37 casos** cuyo build script no evalúa: la rejilla existe —sus
+  filas salen de base, donde 35 de esos 37 tienen los cinco targets verdes— y ninguna celda de esa
+  columna es `⊘` ni roja, porque nada llegó a compilarse. **Siguen siendo casos de pleno derecho**,
+  y de hecho los que mejor encajan en la ruta de reparación build-level.
 - **Sección no alcanzada** (`null` porque `case_state` no llegó): se dibuja el bloque con su razón
-  a la vista. Un `NO_REPAIR_NEEDED` deja cuatro secciones así, y eso es un resultado correcto.
+  a la vista. Un `NO_REPAIR_NEEDED` deja cuatro secciones así, y eso es un resultado correcto. Un
+  `NOT_REPRODUCED` deja las mismas cuatro y **no** es un resultado del pipeline: es que no
+  reprodujimos el fallo del catálogo, y la vista lo dice con esas palabras, junto a la comparación
+  de probes que lo produjo ([ADR 0014](../../Kmp-Repair-Agents/docs/decisions/0014-not-reproduced-is-not-no-repair-needed.md)).
 - **Target no ejecutable** (`environment_unavailable`): existe, se probó, la máquina no podía
   construirlo. **Nunca se pinta como fallo** y nunca entra en un denominador. Regla heredada tal
   cual del [front del Mining](../../../MINING/Kmp-Repair-Mining-FrontEnd/docs/data-contract.md).

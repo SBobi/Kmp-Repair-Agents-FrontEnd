@@ -37,14 +37,31 @@ El dump del Mining se congeló una vez; este crece con cada paso del roadmap. La
 `schema_version` en la frontera y **falla ruidosamente** con un dump que no reconoce, en vez de
 renderizar secciones a medias. Es la diferencia práctica entre los dos frontends.
 
+**CodeCharta se dibuja acá, con `three.js`, y el `.cc.json` además se puede descargar.**
+El visor oficial de CodeCharta es una app externa (`maibornwolff.github.io`) y KMP-IMPACT lo embebe
+por iframe contra ese host. Eso choca de frente con «los datos se importan, no se piden»: un iframe
+reintroduce las tres ramas que esa regla elimina —carga, error, race— y añade una cuarta que no
+teníamos, **un tercero que ve qué caso estás mirando**, en un artefacto que se publica.
+
+Así que la ciudad la dibujamos nosotros sobre el mismo `.cc.json` —es un árbol de nodos con tres
+atributos numéricos; extruir cajas sobre un treemap no es exótico— y al lado va el archivo
+descargable con un botón «abrir en CodeCharta». Si alguien quiere el visor oficial, **salir es su
+acción y no la de la página**.
+
+→ Vendorizar el visor oficial el día que la nuestra se quede corta. Se descartó de entrada porque
+es arrastrar una app Angular entera con su toolchain: mucho más código del que evita.
+
+`three.js` es la única dependencia nueva que este repo añade sobre el stack heredado, y entra por
+un requisito que ninguna de las heredadas cubre: 3D.
+
 **Componentes portados, no reinventados.**
 `ProbeMatrix`, `DiffView` y `ChipGroup` ya existen resueltos en
 `../../../MINING/Kmp-Repair-Mining-FrontEnd/src/components/`. Se portan adaptando el tipo de entrada
-—la matriz pasa de 2 a 3 columnas en el paso 7— no se rediseñan. Copiar 60 líneas de un componente
+—la matriz pasa de 2 a 3 columnas en el paso 8— no se rediseñan. Copiar 60 líneas de un componente
 ya verificado en navegador es más barato y más seguro que volver a decidir cómo se pinta un
 `environment_unavailable`.
 
-**Sin librería de gráficos.** El grid de evaluación (paso 9) es un heatmap de 4×3 celdas y el panel
+**Sin librería de gráficos.** El grid de evaluación (paso 10) es un heatmap de 4×3 celdas y el panel
 del índice son barras y un donut — SVG a mano, mismo camino que `FamilyDonut`/`RepoBars`. Recharts
 o D3 para eso pesan más que lo que ahorran.
 → Reconsiderar si aparece una visualización con ejes, escalas y zoom de verdad.

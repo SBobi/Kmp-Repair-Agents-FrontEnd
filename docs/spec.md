@@ -40,7 +40,8 @@ Pipeline: entidades del Case Bundle, `CaseState` con sus transiciones, las 5 cla
 `update_kind`. Dump: `kmp-repair schema-dump`.
 
 **Vista Domain.** El grafo de estados dibujado **desde el dump, no a mano**: nodos y aristas tal
-como el dominio las declara, con los caminos de escape marcados (`NO_REPAIR_NEEDED`,
+como el dominio las declara, con los caminos de escape marcados (`NO_REPAIR_NEEDED` y
+`NOT_REPRODUCED`, que se ven distintos porque significan lo contrario,
 `NO_SAFE_PATCH → EXPLAINED`, y `UNAVAILABLE`, alcanzable desde cualquier nodo, con la arista de
 vuelta dibujada solo para los `reason` transitorios). Al lado, la tabla de taxonomía con sus 5
 clases y un ejemplo de diff por clase.
@@ -63,7 +64,16 @@ ni omitidas en silencio. Dentro:
   10 de los 94 casos traen entre 2 y 4: la vista los muestra todos, nunca solo el primero. Cuando
   una fase posterior marcó el **bump primario**, se destaca; mientras siga `null` no se inventa uno.
 - *Execution*: la **rejilla target × stage** (base / updated), heredada del front del Mining con su
-  misma semántica de glifos. Debajo, las `FailureObservation` tipadas con su rol causal
+  misma semántica de glifos, **más una columna de nivel** — `compile`, `compile-test`, `link`,
+  `test-run`. Sin ella, los 7 casos que solo rompen al compilar tests quedan escondidos como «un
+  target más», que es justo el dato que dice que compilar `main` no alcanza.
+
+  **La rejilla tiene las filas que el caso tiene**, y esas filas salen de la revisión base. En los
+  37 casos cuyo build script no evalúa en `updated`, la rejilla existe —35 de ellos tienen los
+  cinco targets verdes en base— y lo que colapsa es **esa columna**: cada celda se dibuja **«no
+  alcanzado: la configuración falló antes»**, con el error de configuración encima. Ni `⊘` —que
+  diría «no pudimos»— ni rojo —que diría «ese target rompió»—. Un target que el repo nunca declaró
+  tampoco es `⊘`: simplemente no tiene fila. Debajo, las `FailureObservation` tipadas con su rol causal
   (primary/cascade/preexisting/regression) — **incluido el texto de error real**, que es
   exactamente lo que el front del Mining declaró imposible de mostrar porque la campaña solo
   guardó un booleano.
@@ -85,7 +95,27 @@ Mining, y alimentado por el `environment_fingerprint` del corpus cuando el caso 
 adapter.** Si el dump real necesita campos que el fake no producía, el `ScriptedRunner` estaba
 mintiendo y los tests con fakes valían menos de lo que parecía.
 
-### Paso 4 — localización determinista
+### Paso 4 — evidencia dinámica: exploración de UI
+
+Pipeline: puerto `UiExplorer` con `DroidBotExplorer` y `FakeExplorer`, `assembleDebug` sobre base y
+updated, y la base explorada **dos veces** para medir el piso de ruido
+([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)).
+
+**Vista Evidencia dinámica** (solo cuando el caso la tiene; `null` fuera de Android). El diff de
+exploración **con su piso de ruido al lado, siempre**: un diff de 3 pantallas sobre un piso de 4 no
+es una regresión, y mostrarlo sin el piso lo convertiría en una. Debajo, la cobertura por activity
+—cuántas veces se visitó cada pantalla—, que es lo que deja juzgar si una pantalla «ausente» lo
+está o simplemente no se visitó.
+
+`blocked` se dibuja como bloqueado **con su motivo**, nunca como verde ni como regresión — misma
+regla que `⊘`. Y la vista dice explícitamente que **una exploración sin diferencias no prueba
+equivalencia de comportamiento**: prueba que un recorrido acotado no encontró diferencias.
+
+*Probado:* que un diff **bajo** el piso no se publique como regresión. `ui_regression_case` sobre
+`FakeExplorer` lo verifica sin encender un emulador — que es la única forma de probar de manera
+determinista una lógica cuyo objeto es medir varianza.
+
+### Paso 5 — localización determinista
 
 Pipeline: extractor estructural (source-sets, expect/actual) + scorer determinista.
 
@@ -95,12 +125,43 @@ expansión de familia expect/actual, y la evidencia dinámica (targets y tareas 
 menciones en el mensaje de error). Cada fila muestra qué señal aportó cuánto.
 
 Al lado, el **grafo de source-sets** con los links expect/actual, y — cuando el extractor no pudo
-parsear con confianza — el modelo parcial **marcado como parcial**, no disfrazado de completo.
+parsear con confianza — el modelo parcial **marcado como parcial**, no disfrazado de completo. El
+modelo trae `extraction_layers`, así que la vista dice **con qué capas se construyó**: un modelo de
+capa 3 sola no vale lo mismo que uno con Gradle detrás, y en los 37 casos que no configuran la capa
+autoritativa no existe.
+
+Y un `orphan_actual` —un `actual` sin su `expect`— se muestra como hallazgo, no se omite: suele
+significar que la actualización eliminó la declaración compartida.
+
+**Cuatro codificaciones heredadas de KMP-IMPACT**, del mismo autor, reescritas en React sobre el
+JSON ya emitido — se traslada qué se dibuja, nunca las 3.100 líneas que lo generan allá
+([ADR 0016](../../Kmp-Repair-Agents/docs/decisions/0016-what-we-reuse-from-kmp-impact-and-old.md)):
+
+| vista | codificación |
+|---|---|
+| **Sunburst** | source-set → paquete → archivo, jerárquico. Es la forma de ver de un vistazo si el impacto cayó en código compartido o en una sola plataforma |
+| **`impact_level`** | 0 no impactado · 1 transitivo · 2 directo. Tres niveles, ya probados en repos reales |
+| **Árbol de propagación** | cada archivo transitivo con su `propagated_from`: se ve por qué entró, no solo que entró |
+| **CodeCharta** | ciudad 3D: área = líneas reales, altura = `complexity_proxy`, **color = `impact_level`**. Vista delta por bump, más los snapshots antes/después. **Se dibuja acá con `three.js`**, no por iframe a un host externo — ver [stack.md](stack.md) — y el `.cc.json` queda descargable para quien prefiera el visor oficial |
+
+**`complexity_proxy` es la altura, y no es complejidad.** Se hereda de KMP-IMPACT, donde se llama
+`mcc` y se documenta como «heurística tipo McCabe», pero el cálculo real es
+`1 + <nº de palabras clave de rama halladas por regex>`: no recorre el grafo de flujo, no distingue
+ramas alcanzables, no entiende un `when` exhaustivo. Se renombra a lo que es, la fórmula viaja a su
+lado, y **es canal visual y nada más**: nunca en una tabla, nunca en una métrica, nunca en una cifra
+del reporte. Como canal solo necesita ser monótono y estable —un archivo con más ramas se ve más
+alto—, no correcto. Publicarlo como «complejidad» sería el defecto A03 otra vez: dar por evidencia
+algo que quien recibe el artefacto no puede comprobar.
+
+**Una señal que no se pudo computar no se dibuja como cero.** El BFS de imports depende de un mapa
+grupo-Maven → paquete-Kotlin que es **incompleto por construcción**; cuando un grupo no está
+mapeado, la fila muestra **«señal no disponible»**, no un `0`. Un peso en cero mueve el ranking; un
+«no sé» no.
 
 *Probado:* se ve *por qué* un archivo quedó primero. Un ranking que sale bien por la señal
 equivocada es indistinguible de uno correcto en una métrica agregada, y obvio en esta vista.
 
-### Paso 5 — Localization Agent: determinista vs. re-rank
+### Paso 6 — Localization Agent: determinista vs. re-rank
 
 Pipeline: el agente re-rankea el top-K acotado, con fallback determinista.
 
@@ -113,7 +174,7 @@ deja de ser una promesa del documento y pasa a ser algo que se mira: el fallback
 ocurrió, y se ve. También se ve el caso incómodo — que el agente empeore un ranking que ya estaba
 bien.
 
-### Paso 6 — reparación: intentos de patch
+### Paso 7 — reparación: intentos de patch
 
 Pipeline: ruta build-level (extracción determinista de versión antes que el agente) + Repair Agent
 para source-level + aplicador atómico.
@@ -133,7 +194,7 @@ rechazo no dispara nunca (0 de 117 bumps), así que si aparece uno, es para mira
 marca 1, la extracción determinista de versión mínima no está entrando y el ADR 0004 está roto en
 la práctica aunque los tests pasen.
 
-### Paso 7 — validación multi-target
+### Paso 8 — validación multi-target
 
 Pipeline: re-corrida sobre workspace fresco con el patch re-aplicado, split remanente/nuevo,
 outcome repo-level.
@@ -147,7 +208,7 @@ los targets ejecutables pasan; `environment_unavailable` no cuenta ni a favor ni
 promediado. `ios_linkage_case` muestra compile verde y link rojo en el **mismo target** — la razón
 por la que CTSR y BSR no son la misma métrica.
 
-### Paso 8 — explicación
+### Paso 9 — explicación
 
 Pipeline: renderer puro + Explanation Agent con fallback a plantilla.
 
@@ -165,7 +226,7 @@ Cuando la narrativa vino del fallback determinista y no del agente, la vista lo 
 lado de los hechos duros que la originaron; una explicación que afirme algo que la matriz de al
 lado contradice se ve inmediatamente.
 
-### Paso 9 — evaluación: el grid
+### Paso 10 — evaluación: el grid
 
 Pipeline: `EvidenceProfile × AttemptPolicy`, los 5 baselines, las métricas.
 
@@ -174,7 +235,9 @@ baselines. Reglas duras heredadas del protocolo:
 
 - Una métrica `None` se pinta **`None`, nunca 0** — un caso sin ground truth no es un caso con
   Hit@k cero.
-- `NO_REPAIR_NEEDED` se reporta como tasa aparte, fuera del promedio de BSR/CTSR/FFSR/EFR.
+- `NO_REPAIR_NEEDED` se reporta como tasa aparte, fuera del promedio de BSR/CTSR/FFSR/EFR. Y
+  `NOT_REPRODUCED` como **otra** tasa aparte, nunca sumada a la anterior: una dice «no había nada
+  que reparar», la otra «no reprodujimos el fallo». Sobre el corpus solo la segunda es posible.
 - La abstención (`NO_SAFE_PATCH`) se reporta solo sobre los casos que tenían algo que reparar.
 - El CSV por-caso completo siempre descargable: el agregado es el titular, el detalle es el
   apéndice, y de la pantalla se debe poder bajar a un caso concreto.
@@ -182,7 +245,7 @@ baselines. Reglas duras heredadas del protocolo:
 *Probado:* que el agregado no esté escondiendo su composición. De cada celda del heatmap se llega a
 los casos que la forman.
 
-### Paso 10 — el corpus real: índice de los 94
+### Paso 11 — el corpus real: índice de los 94
 
 Pipeline: `SqliteCaseCatalogSource` sobre `model_input_v1.db` + corrida completa. **No el corpus
 completo**: la reparación humana vive en una bóveda aparte que solo abre el evaluador, después de
@@ -228,10 +291,10 @@ nada.
 ## Mapa de rutas
 
 ```
-/#/                      índice de casos (paso 10; antes, la lista de lo que haya)
+/#/                      índice de casos (paso 11; antes, la lista de lo que haya)
 /#/case/:owner/:name/:pr  ficha: las 6 secciones del Case Bundle
 /#/domain                 máquina de estados y taxonomía (paso 1)
-/#/eval                   grid, baselines, métricas (paso 9)
+/#/eval                   grid, baselines, métricas (paso 10)
 ```
 
 Navegación anterior/siguiente dentro del filtro activo en la ficha, igual que en el front del
