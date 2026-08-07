@@ -46,14 +46,16 @@ Las seis secciones centrales son, una a una, las
 | `case_key`, `resolved_key` | paso 2 | la llave tal como se pidió (`owner/name#pr` o `owner/name@base..head`) y la **resuelta**, siempre en forma `@base..head`. Las dos tienen que sobrevivir a una URL. Cuando difieren, la vista muestra a qué revisiones resolvió: un `#pr` no fija contenido y un PR reescrito resuelve distinto |
 | `case_state` | paso 2 | el estado terminal alcanzado — es lo que explica cada sección ausente |
 | `blocked` | paso 2 | `null` salvo que `case_state` sea `UNAVAILABLE`; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
-| `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y 10 de los 94 casos traen entre 2 y 4. `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión". El bump primario es nullable y lo llena un paso posterior, nunca la ingesta |
+| `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y **10 de los 94** casos traen entre 2 y 4 (3 con dos, 5 con tres, 2 con cuatro). `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión", y **no es hipotética: son 4 de los 94** —`Oztechan/CCC#2807` y `#4332`, `meshtastic/Meshtastic-Android#5212` y `#5676`, los cuatro `reference-update`—, así que una vista probada solo con listas no vacías se rompe en el 4 % del corpus. El bump primario es nullable y lo llena un paso posterior, nunca la ingesta. Cifras medidas sobre `paper_corpus_v1.db` el 2026-08-06 |
 | `execution` | paso 2 | probes por target y stage, `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados |
 | `structural` | paso 4 | grafo de source-sets, pertenencia a targets, links expect/actual, y `partial: bool` |
 | `repair` | paso 4 (localización) / 6 (patches) | candidatos rankeados con desglose por señal; intentos de patch con diff, ruta y motivo de rechazo |
 | `validation` | paso 7 | matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level |
 | `explanation` | paso 8 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si vino del agente o del fallback |
 | `agent_calls` | paso 5 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
-| `catalog_origin` | paso 10 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` (`spdx`/`resolved_at`/`url`) y `base_commit_date` |
+| `catalog_origin` | paso 10 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
+| `licence` | paso 10 | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
+| `warning` | paso 6 | el aviso experimental **del parche generado** —`GeneratedPatch.warning`, que empieza *«Generated automatically by a research experiment…»*—, **renderizado tal cual llega** y nunca reescrito por la app. **No es el aviso del corpus**: `notice.experimental_use_only` habla de las reparaciones humanas minadas, y son dos sujetos distintos que el minado mantiene separados a propósito (A18/A30). Más `experimental_only: true` y `maintainer_reviewed: false` legibles por máquina, para que un script que consuma el dump llegue a la misma conclusión que quien lee la página |
 
 ## Tres tipos de ausencia distintos
 
@@ -65,7 +67,11 @@ Distinguirlos es la única forma de que la UI no mienta:
   construirlo. **Nunca se pinta como fallo** y nunca entra en un denominador. Regla heredada tal
   cual del [front del Mining](../../../MINING/Kmp-Repair-Mining-FrontEnd/docs/data-contract.md).
 - **Métrica no aplicable** (`None`): un caso sin `ground_truth_files` tiene `Hit@k = None`. **Se
-  pinta `None`, nunca 0** — política del paper, no una excepción de esta app.
+  pinta `None`, nunca 0** — política del paper, no una excepción de esta app. Sobre
+  `paper_corpus_v1` **no hay ningún caso así**: los 94 traen `ground_truth_files`. La vista tiene
+  que soportar `None` igual, pero no hay que esperarlo en esta corrida — y un `Hit@k = 0` con
+  ground truth presente **no** es este caso: significa que el ranking no lo alcanzó, como el fix
+  por punteros de submódulo de `Oztechan/CCC#2960`.
 
 ## Lo que este dump NO tiene
 

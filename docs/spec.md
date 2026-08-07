@@ -184,15 +184,35 @@ los casos que la forman.
 
 ### Paso 10 — el corpus real: índice de los 94
 
-Pipeline: `SqliteCaseCatalogSource` sobre `paper_corpus_v1.db` + corrida completa.
+Pipeline: `SqliteCaseCatalogSource` sobre `model_input_v1.db` + corrida completa. **No el corpus
+completo**: la reparación humana vive en una bóveda aparte que solo abre el evaluador, después de
+congelar la salida (A07, ver [ethics.md](../../Kmp-Repair-Agents/docs/ethics.md) §2).
 
 **Índice filtrable** de los 94 casos con su **estado de reparación** — que es literalmente el hueco
 que el front del Mining declaró fuera de alcance ("es el otro repo, y ese dato no existe todavía").
 Filtros multi-select con conteo, mismo patrón: repo, familia rota, target roto, `update_kind`, JDK,
 y los nuevos — estado final del caso, outcome de validación y **licencia SPDX**, que el
 [ADR 0009](../../Kmp-Repair-Agents/docs/decisions/0009-generated-patches-carry-their-source-licence.md)
-exige como vista de primera clase y no como `grep` (20 de los 94 son GPL-3.0). Filtros en la URL,
-para compartir un subconjunto por enlace.
+exige como vista de primera clase y no como `grep` (20 de los 94 son copyleft: **11
+`GPL-3.0-only` y 9 `GPL-3.0-or-later`**, que no son lo mismo y conceden derechos distintos a quien
+reciba el parche). Filtros en la URL, para compartir un subconjunto por enlace.
+
+**Tres cosas que esta página debe traer desde el primer despliegue**, porque son obligaciones del
+Gate DOI y no adornos —el visor del minado las aprendió tarde y una de ellas le costó purgar el
+historial público:
+
+- **La advertencia experimental en la raíz *y* repetida por caso** (A18). Atrapan lectores
+  distintos: quien llega por enlace directo a un caso nunca pasa por la raíz. La app **renderiza**
+  el texto que trae el dump, no lo reescribe — existían tres redacciones que no se importaban entre
+  sí en el minado, y esa es la forma exacta en que una afirmación corregida sobrevive. **Y es la
+  advertencia del parche generado, no la del corpus**: son dos sujetos distintos y el minado los
+  separa a propósito (A30). Ver [data-contract.md](data-contract.md).
+- **La licencia servida por el propio sitio, sin red** (A04/A17): `licence.local_text` por caso, con
+  su hash, y el enlace a GitHub como secundario. Un archivo de licencia ausente se nota; uno
+  desactualizado no.
+- **Nombrar la licencia es atribución, no permiso** (A17). El visor del minado publicó que nombrarla
+  «nos da derecho a mostrar» el fragmento: es una aserción jurídica, es falsa, y estaba encima de
+  código de terceros en una página pública. El fundamento es cumplir cada licencia, por elemento.
 
 El panel de cabecera debe hacer visible el **desbalance heredado del corpus**, no promediarlo: dos
 repos son el 37% de los casos, Android rompe ~4× más que iOS, y hay 2 casos iOS-solo. Está todo
