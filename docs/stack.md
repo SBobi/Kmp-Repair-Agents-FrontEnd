@@ -80,7 +80,7 @@ re-implementa ninguna regla del pipeline, se comprueba que **el archivo recibido
 Como mínimo, lo que debe fallar si algo se rompe:
 
 - `schema_version` es la que esta app entiende, y `pipeline_git_sha` está presente;
-- toda sección ausente está justificada por `case_state` — no hay huecos sin explicación;
+- toda sección ausente está justificada por el estado (`stage_state` del caso o `state` de la corrida) — no hay huecos sin explicación;
 - ningún `environment_unavailable` aparece contado como fallo en un agregado;
 - ninguna métrica `None` se serializa como `0`;
 - la lista de intentos de patch es una lista, aunque traiga un solo elemento;

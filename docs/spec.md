@@ -169,16 +169,23 @@ algo que quien recibe el artefacto no puede comprobar.
 
 **Una señal que no se pudo computar no se dibuja como cero.** El BFS de imports depende de un mapa
 grupo-Maven → paquete-Kotlin que es **incompleto por construcción**; cuando un grupo no está
-mapeado, la fila muestra **«señal no disponible»**, no un `0`. Un peso en cero mueve el ranking; un
-«no sé» no.
+mapeado, el nodo muestra **«señal no disponible»**, no un `0`. Un cero dice «no impactado»; un «no
+sé» dice otra cosa, y confundirlos es lo que esta vista tiene que impedir.
 
-*Probado:* se ve *por qué* un archivo quedó primero. Un ranking que sale bien por la señal
-equivocada es indistinguible de uno correcto en una métrica agregada, y obvio en esta vista.
+**Y esta vista NO pinta un ranking con pesos: no hay ninguno.** El árbol **ya viene ordenado** por
+`distance` y `relation`, y ése es el ranking determinista entero
+([ADR 0032](../../Kmp-Repair-Agents/docs/decisions/0032-the-impact-tree-is-the-deterministic-ranking.md)).
+Lo que hay que ver acá es **qué hay en el árbol y a qué distancia**; quién lo purga es el paso 6.
+
+*Probado:* se ve *por qué* un archivo está en el árbol y por qué está donde está — qué semilla lo
+alcanzó, por qué arista y a qué distancia. Un árbol que recluta lo correcto por el camino equivocado
+es indistinguible de uno bueno en una métrica agregada, y obvio en esta vista.
 
 ### Paso 6 — Localization Agent: el recorrido
 
-Pipeline: el agente recorre el árbol en **bucle con herramientas**, leyendo código, y devuelve una
-lista rankeada de longitud que él elige.
+Pipeline: el agente **purga el árbol** — recibe uno que ya viene ordenado y devuelve una lista más
+corta, en bucle con herramientas y leyendo código. **Solo en el modo 4**: los modos 2 y 3 reciben el
+árbol y van directo a §6.
 
 **Vista Recorrido**, y la clave es que se dibuja **sobre el árbol completo del paso 5**: qué nodos
 abrió y en qué orden, cuáles quedaron sin abrir, y hasta qué `distance` bajó. Doce de trescientos
@@ -292,7 +299,46 @@ desarrollador: los cuatro criterios se evaluarían sobre textos de naturaleza di
 lado de los hechos duros que la originaron; una explicación que afirme algo que la matriz de al
 lado contradice se ve inmediatamente.
 
-### Paso 10 — evaluación: el grid
+### Paso 9b — el lazo: un caso vuelta a vuelta
+
+Pipeline: §7 decide si hay otra vuelta y le pasa `is_final` a §8; cada vuelta es una fila de
+`attempt` con su patch, su matriz y su prosa
+([ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md)).
+
+**Vista Vueltas.** Las hasta tres, en orden, con lo que cambió entre ellas: el diff, la matriz
+target × outcome, y la prosa. Dos cosas que la vista **tiene** que hacer visibles:
+
+- **Cuál es la final.** Es la marcada `is_final`, y es la única que puntúa la auditoría de
+  desarrollador. Las intermedias son insumo del lazo; pintarlas al mismo nivel haría creer que el
+  caso produjo tres informes.
+- **Qué viajó de vuelta.** En los modos 3 y 4, el prompt de la vuelta *k+1* contiene el error nuevo
+  de §7 **y la prosa entera de §8** de la vuelta *k*. Ponerlos al lado es lo que permite ver si la
+  realimentación sirvió de algo.
+
+*Probado:* que el lazo existe y que su carga es la que decimos. Si la vuelta 2 usa exactamente el
+mismo prompt que la 1, se ve — y entonces el modo 3 no es lo que su nombre dice.
+
+### Paso 9c — los cuatro modos, lado a lado
+
+Pipeline: la proyección del bundle por modo, `run` como tabla, aislamiento entre modos y
+`ReplayProvider` ([ADR 0028](../../Kmp-Repair-Agents/docs/decisions/0028-four-modes-and-on-demand-exploration.md),
+[ADR 0032](../../Kmp-Repair-Agents/docs/decisions/0032-the-impact-tree-is-the-deterministic-ranking.md),
+[ADR 0033](../../Kmp-Repair-Agents/docs/decisions/0033-modes-are-isolated-and-runs-replay-without-models.md)).
+
+**Vista Comparar modos.** El mismo caso en cuatro columnas, y arriba de todo **lo que comparten**:
+§1-§4, idénticas por construcción. Debajo, por modo: qué recibió, qué leyó, qué tocó, cómo terminó.
+
+- **`localization` vacía en los modos 1-3 se pinta «este modo no tiene esa etapa»**, nunca «falta un
+  dato». El `mode` de la fila lo dice.
+- **El modo 1 no tiene árbol de impacto y eso se ve**, porque es lo que lo define: es el baseline
+  sin contexto localizado.
+- **Nada de un modo aparece dentro de otro.** Si la vista los mezcla, invita a leer una fuga que el
+  pipeline prohíbe.
+
+*Probado:* la garantía central del diseño — que los cuatro partieron de la misma evidencia. En
+cuatro columnas con la cabecera compartida, una diferencia arriba es un bug visible de inmediato.
+
+### Paso 10 — evaluación: la rejilla modo × vuelta
 
 Pipeline: los **cuatro modos** —`raw_error`, `context_rich`, `iterative_agentic`,
 `full_pipeline`— y las métricas. `EvidenceProfile × AttemptPolicy` ya no existe: **el modo es el
@@ -379,9 +425,13 @@ nada.
 
 ```
 /#/                      índice de casos (paso 11; antes, la lista de lo que haya)
-/#/case/:owner/:name/:pr  ficha: las 8 secciones del Case Bundle
+/#/case/:owner/:name/:base..:head   ficha: §1-§4 + las 4 corridas
+/#/case/.../:mode                    una corrida
+/#/case/.../:mode/:turn              una vuelta
+     `#pr` se acepta como alias y redirige: model_input NO trae pr_number,
+     así que los 94 casos son inalcanzables por la forma vieja
 /#/domain                 máquina de estados y taxonomía (paso 1)
-/#/eval                   grid, baselines, métricas (paso 10)
+/#/eval                   rejilla modo × vuelta, métricas (paso 10)
 ```
 
 Navegación anterior/siguiente dentro del filtro activo en la ficha, igual que en el front del
