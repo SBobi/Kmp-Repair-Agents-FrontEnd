@@ -273,6 +273,15 @@ revisores externos ni participantes — ver
 [evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)). Exporta el CSV de auditoría
 (`case_id` + 4 columnas sí/no).
 
+**Llegan más casos de los que parece.** No solo los reparados: `NOT_REPRODUCED`, `NO_REPAIR_NEEDED`
+y `NO_SAFE_PATCH` también traen artefacto, así que la vista tiene que saber dibujar una explicación
+**sin patch** ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)). Un
+`UNAVAILABLE` permanente no trae ninguna y eso es correcto, no un hueco.
+
+**Los cuatro criterios se auditan sobre el artefacto, no sobre la prosa.** Si la narrativa está
+marcada como ausente, el caso se pinta **no auditable** y sale del denominador — nunca como cuatro
+noes.
+
 **Si la prosa no vino del agente, la vista lo dice y no la disfraza.** El agente se llama siempre
 ([ADR 0023](../../Kmp-Repair-Agents/docs/decisions/0023-the-agent-always-runs.md)); si falló, el
 artefacto existe igual con los hechos duros y la narrativa **marcada como ausente**. Una plantilla
@@ -291,7 +300,10 @@ Pipeline: `EvidenceProfile × AttemptPolicy`, los 5 baselines, las métricas.
 baselines. Reglas duras heredadas del protocolo:
 
 - Una métrica `None` se pinta **`None`, nunca 0** — un caso sin ground truth no es un caso con
-  Hit@k cero.
+  Hit@k cero. Y hay un `None` **estructural** que la app va a ver todo el tiempo: las métricas de
+  localización llegan vacías hasta que el evaluador corre, porque exigen la bóveda. Las de
+  reparación —`BSR`/`CTSR`/`FFSR`/`EFR`— vienen en el dump desde la corrida
+  ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)).
 - `NO_REPAIR_NEEDED` se reporta como tasa aparte, fuera del promedio de BSR/CTSR/FFSR/EFR. Y
   `NOT_REPRODUCED` como **otra** tasa aparte, nunca sumada a la anterior: una dice «no había nada
   que reparar», la otra «no reprodujimos el fallo». Sobre el corpus solo la segunda es posible.
