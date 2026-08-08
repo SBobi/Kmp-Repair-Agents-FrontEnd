@@ -43,19 +43,26 @@ con sus vueltas**: el dump se pide por caso, por caso+modo, o por caso+modo+vuel
 
 ```
 { schema_version, generated_at, pipeline_git_sha,
-  case_key, resolved_key, stage_state, blocked,
-  update, execution, dynamic, structural,          ← COMPARTIDAS por los cuatro modos
-  mode, state, localization,                       ← de la corrida: mode identifica cuál
-  attempts: [ { turn, is_final,
-                synthesis, validation, explanation } ],
-  agent_calls, catalog_origin, licence, warning }
+  case_key, resolved_key, case_id, stage_state, blocked,   ← del CASO
+  update, execution, dynamic, structural,     ← COMPARTIDAS por los cuatro modos
+
+  runs: [ { mode, state, blocked, localization,            ← UNA POR MODO
+            workspace_sha, identical_resample_rate, metrics,
+            attempts: [ { turn, is_final,
+                          synthesis, validation, explanation } ],
+            agent_calls } ],
+
+  catalog_origin, licence, warning }
 ```
 
-**El dump se pide a tres granularidades**, porque la corrida ya no es una:
-`dump <case>` trae las cuatro secciones compartidas y las cuatro corridas; `dump <case> --mode
-<m>` trae una; `dump <case> --mode <m> --turn <n>` trae una vuelta. Las cuatro primeras secciones
-son **idénticas en las cuatro corridas** por construcción, y ésa es la garantía de que una
-diferencia entre modos es del modo.
+**`runs` es un array y eso no es un detalle**: un caso son **hasta cuatro corridas**, y el `dump`
+las trae todas. `mode = null` en una corrida única significa que el caso salió en §2 o §3 y ningún
+modo lo intentó — **no** cuatro corridas vacías.
+
+**Tres granularidades**, filtrando ese array: `dump <case>` trae todo; `dump <case> --mode <m>` deja
+una corrida; `dump <case> --mode <m> --turn <n>` deja una vuelta. Las cuatro secciones de arriba son
+**idénticas en las cuatro corridas** por construcción, y ésa es la garantía de que una diferencia
+entre modos es del modo — por eso viven **fuera** del array y no dentro de cada corrida.
 
 Las ocho del medio siguen siendo **las ocho secciones del Case Bundle y ninguna más**, una por etapa
 del pipeline — [ADR 0017](../../Kmp-Repair-Agents/docs/decisions/0017-case-bundle-nine-sections.md), que
