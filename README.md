@@ -1,8 +1,9 @@
 # kmp-repair-agents-frontend
 
 Visor de los Case Bundles que produce [`Kmp-Repair-Agents`](../Kmp-Repair-Agents): qué evidencia
-recogió el pipeline antes y después de la actualización, dónde localizó la rotura y por qué, qué
-patch intentó, si validó, y qué explica.
+recogió el pipeline antes y después de la actualización, **qué árbol de impacto construyó y cómo lo
+recorrió el agente**, dónde localizó la rotura y por qué, qué patch intentó, si validó, y qué
+explica.
 
 **Este repo solo muestra.** No ejecuta builds, no llama a ningún LLM, no decide nada sobre un caso.
 Importa un JSON y lo dibuja — mismo contrato que

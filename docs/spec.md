@@ -115,14 +115,25 @@ equivalencia de comportamiento**: prueba que un recorrido acotado no encontró d
 `FakeExplorer` lo verifica sin encender un emulador — que es la única forma de probar de manera
 determinista una lógica cuyo objeto es medir varianza.
 
-### Paso 5 — localización determinista
+### Paso 5 — el plano: modelo estructural y árbol de impacto
 
-Pipeline: extractor estructural (source-sets, expect/actual) + scorer determinista.
+Pipeline: extractor estructural (source-sets, expect/actual) + **árbol de impacto** (BFS sin límite,
+dos semillas, aristas `configura` hacia los nodos de build). **No hay scorer**
+([ADR 0019](../../Kmp-Repair-Agents/docs/decisions/0019-the-agent-localizes-over-a-deterministic-tree.md)).
 
-**Vista Localización.** Los candidatos rankeados con el **desglose por señal**, no solo el orden
-final: overlap de source-set/target, relación de import/entidad, mención en el dependency-diff,
-expansión de familia expect/actual, y la evidencia dinámica (targets y tareas que fallaron,
-menciones en el mensaje de error). Cada fila muestra qué señal aportó cuánto.
+**Vista El plano.** El árbol de propagación entero, tal como el agente lo va a recibir: cada nodo
+con su `relation` (`DIRECT` / `TRANSITIVE` / `EXPECT_ACTUAL`), su `distance`, y `propagated_from`
+—por quién llegó—. Las semillas se distinguen de lo propagado, y se distingue **de qué semilla**:
+importadores de la dependencia, o entidades del error de §2.
+
+Lo que esta vista prueba es lo que ninguna métrica muestra: **el árbol se puede mirar entero antes
+de que ningún agente lo toque**, y es lo que diagnostica el momento 1 de la medición. Si el archivo
+correcto no está acá, el agente no va a poder leerlo — aunque **sí** puede proponerlo, y si acierta
+así es el hallazgo más interesante de la corrida.
+
+Los nodos de build cuelgan por la arista `configura`, no por imports — y el wrapper cuelga de la
+raíz con alcance `GLOBAL`, que la vista tiene que pintar distinto: colgarlo de un módulo sería una
+dirección falsa.
 
 Al lado, el **grafo de source-sets** con los links expect/actual, y — cuando el extractor no pudo
 parsear con confianza — el modelo parcial **marcado como parcial**, no disfrazado de completo. El
@@ -161,18 +172,36 @@ mapeado, la fila muestra **«señal no disponible»**, no un `0`. Un peso en cer
 *Probado:* se ve *por qué* un archivo quedó primero. Un ranking que sale bien por la señal
 equivocada es indistinguible de uno correcto en una métrica agregada, y obvio en esta vista.
 
-### Paso 6 — Localization Agent: determinista vs. re-rank
+### Paso 6 — Localization Agent: el recorrido
 
-Pipeline: el agente re-rankea el top-K acotado, con fallback determinista.
+Pipeline: el agente recorre el árbol en **bucle con herramientas**, leyendo código, y devuelve una
+lista rankeada de longitud que él elige.
 
-**Dos columnas en la misma vista**: ranking determinista y ranking del agente, con el movimiento de
-cada candidato entre ambos. Cuando el output no parseó, la vista muestra el ranking determinista
-**y lo dice explícitamente**.
+**Vista Recorrido**, y la clave es que se dibuja **sobre el árbol completo del paso 5**: qué nodos
+abrió y en qué orden, cuáles quedaron sin abrir, y hasta qué `distance` bajó. Doce de trescientos
+cuarenta se ve de un vistazo; una tabla de doce filas no.
 
-*Probado:* [ADR 0004](../../Kmp-Repair-Agents/docs/decisions/0004-deterministic-first-agent-escalation.md)
-deja de ser una promesa del documento y pasa a ser algo que se mira: el fallback ocurrió o no
-ocurrió, y se ve. También se ve el caso incómodo — que el agente empeore un ranking que ya estaba
-bien.
+Al lado, los números del recorrido y la lista rankeada con su justificación por archivo. Tres cosas
+que la vista **tiene** que distinguir:
+
+- **`truncated`** — el presupuesto de lecturas lo cortó. Terminar porque quiso no puede verse igual
+  que quedarse sin presupuesto, misma regla que `⊘` y que `downgrade_check: SKIPPED`.
+- **`off_tree`** — el agente propuso un archivo que **no recorrió**. Se acepta si la ruta existe en
+  el repositorio; solo se rechaza la inventada. Es una afirmación más débil que una propuesta leída,
+  y se marca como tal — pero si acierta, es el hallazgo más interesante de la corrida.
+- **`seen_not_listed`** —leyó el archivo correcto y no lo listó— **no viene en el dump**. Lo deriva
+  el evaluador cruzando `files_read[]` con el ground truth, porque calcularlo dentro del pipeline
+  sería abrir la bóveda en corrida. La app lo muestra si el evaluador se lo pasa; nunca lo calcula
+  ella, igual que no recalcula ninguna otra regla.
+
+Y **la longitud de la lista al lado de los `Hit@k`**: con lista variable el modelo controla el
+denominador, y sin ese número «devolvé muchos» sería una estrategia ganadora
+([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)).
+
+*Probado:* que el aporte es lo que decimos que es. El árbol del paso 5 es determinista y está a la
+vista; lo que esta pantalla muestra es **qué hizo el agente con él**. Si el recorrido resulta ser
+«abrió los dos primeros nodos y devolvió eso», se ve — y es un resultado, no un éxito escondido
+detrás de un `Hit@1`.
 
 ### Paso 7 — reparación: intentos de patch
 
@@ -239,6 +268,17 @@ baselines. Reglas duras heredadas del protocolo:
   `NOT_REPRODUCED` como **otra** tasa aparte, nunca sumada a la anterior: una dice «no había nada
   que reparar», la otra «no reprodujimos el fallo». Sobre el corpus solo la segunda es posible.
 - La abstención (`NO_SAFE_PATCH`) se reporta solo sobre los casos que tenían algo que reparar.
+- **Localización: los tres momentos van siempre juntos, nunca uno solo.** Reclutamiento
+  (`Recall@tree`), selección (`Hit@1/3/5`, `MRR`, source-set) y acción (qué tocó de verdad).
+  Publicar el segundo sin el primero le atribuye al agente un fallo del análisis
+  ([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)).
+- **Y dos números que van pegados a esos, o el panel miente**: la **longitud media de la lista**
+  —con lista variable el modelo controla el denominador, y «devolvé muchos» sería una estrategia
+  ganadora— y el **tamaño del árbol** —si el árbol es casi todo el repo, `Recall@tree` da ≈ 1 y no
+  diagnostica nada—.
+- Los casos cuyo ground truth no es código localizable —21 de 94 traen archivos no-código y 4 lo
+  tienen puro— salen del denominador del momento 1 y se muestran como **categoría aparte**, igual
+  que los targets `⊘`.
 - El CSV por-caso completo siempre descargable: el agregado es el titular, el detalle es el
   apéndice, y de la pantalla se debe poder bajar a un caso concreto.
 
