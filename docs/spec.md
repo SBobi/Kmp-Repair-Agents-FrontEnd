@@ -55,7 +55,7 @@ cosas que un test unitario también atrapa, pero solo si alguien pensó en escri
 Pipeline: etapas Update + Execution sobre `worked_case` y `no_failure_case`, con `ScriptedRunner`.
 Primer `kmp-repair dump` real.
 
-**Ficha de caso**, la vista central, seis secciones en el orden del Case Bundle. Las secciones que
+**Ficha de caso**, la vista central, nueve secciones en el orden del Case Bundle. Las secciones que
 el caso todavía no alcanzó se marcan **"no alcanzada"** con el estado que lo explica — nunca vacías
 ni omitidas en silencio. Dentro:
 
@@ -292,7 +292,7 @@ nada.
 
 ```
 /#/                      índice de casos (paso 11; antes, la lista de lo que haya)
-/#/case/:owner/:name/:pr  ficha: las 6 secciones del Case Bundle
+/#/case/:owner/:name/:pr  ficha: las 9 secciones del Case Bundle
 /#/domain                 máquina de estados y taxonomía (paso 1)
 /#/eval                   grid, baselines, métricas (paso 10)
 ```

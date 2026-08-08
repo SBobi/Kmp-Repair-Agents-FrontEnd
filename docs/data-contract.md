@@ -34,21 +34,26 @@ rechaza en la frontera (`src/data.ts`), en vez de renderizarse mal en silencio.
 ```
 { schema_version, generated_at, pipeline_git_sha,
   case_key, resolved_key, case_state, blocked,
-  update, execution, structural, repair, validation, explanation,
+  update, execution, dynamic, structural,
+  localization, synthesis, application, validation, explanation,
   agent_calls, catalog_origin, licence, warning }
 ```
 
-Las seis del medio son **las seis secciones del Case Bundle y ninguna más** — `ui_evidence` cuelga
-de `execution`, no a su lado, porque es evidencia de §2 y el
-[ADR 0002](../../Kmp-Repair-Agents/docs/decisions/0002-case-bundle-six-sections.md) fija esas seis
-como la estructura organizadora del pipeline entero.
+Las nueve del medio son **las nueve secciones del Case Bundle y ninguna más**, una por etapa del
+pipeline — [ADR 0017](../../Kmp-Repair-Agents/docs/decisions/0017-case-bundle-nine-sections.md), que
+sustituye al [ADR 0002](../../Kmp-Repair-Agents/docs/decisions/0002-case-bundle-six-sections.md).
+
+**Cambió respecto a la forma anterior, y hay que leerlo con cuidado:** `ui_evidence` **ya no cuelga
+de `execution`** — es la sección de primer nivel `dynamic`. Y `repair` **ya no existe**: se partió en
+`localization`, `synthesis` y `application`, porque eran tres preguntas distintas —dónde, qué
+escribo, entra o no— y las escriben tres cosas distintas, la última de ellas **ningún agente**.
 
 **Este boceto es la lista de filas de la tabla de abajo, no una redacción paralela.** Se escribió
 una vez con doce campos y quedó atrás en cuanto la tabla creció debajo — la forma exacta del defecto
 A01. Si se añade una fila, se añade acá.
 
-Las seis secciones centrales son, una a una, las
-[6 etapas del Case Bundle](../../Kmp-Repair-Agents/docs/stages.md).
+Las nueve secciones centrales son, una a una, las
+[9 etapas del Case Bundle](../../Kmp-Repair-Agents/docs/stages.md).
 
 | campo | presente desde | notas |
 |---|---|---|
@@ -58,9 +63,11 @@ Las seis secciones centrales son, una a una, las
 | `blocked` | paso 2 | `null` salvo que `case_state` sea `UNAVAILABLE`; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
 | `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y **10 de los 94** casos traen entre 2 y 4 (3 con dos, 5 con tres, 2 con cuatro). `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión", y **no es hipotética: son 4 de los 94** —`Oztechan/CCC#2807` y `#4332`, `meshtastic/Meshtastic-Android#5212` y `#5676`, los cuatro `reference-update`—, así que una vista probada solo con listas no vacías se rompe en el 4 % del corpus. El bump primario es nullable y lo llena un paso posterior, nunca la ingesta. Cifras medidas sobre `paper_corpus_v1.db` el 2026-08-06 |
 | `execution` | paso 2 | probes por target y stage **con su nivel** (`configuration`, `compile`, `compile-test`, `link`, `test-run`), `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados, hash del log crudo en el `ArtifactStore`, y la comparación contra los probes del catálogo |
-| `execution.ui_evidence` | paso 4 | `null` fuera de Android. Si no: `status` (`completed`/`blocked`/`skipped`), `blocked_reason`, el **piso de ruido** medido explorando la base dos veces, los diffs por pantalla y la cobertura por activity. **Columna aparte: no entra en ningún outcome ni en BSR/CTSR/FFSR** ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)) |
-| `structural` | paso 5 | **por archivo**: `impact_level` (0 no impactado / 1 transitivo / 2 directo), `propagated_from` (de qué archivo entró un transitivo), `rloc` (líneas reales) y `complexity_proxy`. Son los cuatro campos que alimentan sunburst, árbol de propagación y CodeCharta — **el `.cc.json` lo deriva el visor de aquí**, el pipeline no lo emite aparte: dos artefactos sobre el mismo caso pueden discrepar, y el que se mira sería el que nadie verifica. Más el `KmpProjectModel`: source-sets con `depends_on`/`targets`/`kind`, targets con su plataforma, links expect/actual, **`orphan_actuals[]`** (un `actual` sin su `expect` — suele significar que la actualización eliminó la declaración compartida), `extraction_layers[]` (con qué capas se construyó: sin Gradle vale menos), `structural_evidence[]` con `provenance` y `confidence`, y `partial: bool`. **`null` en un caso de build verde**: §3 es perezosa, así que un hallazgo de UI puede venir sin modelo estructural — y entonces se muestra **sin atribución a código**, nunca inventada |
-| `repair` | paso 5 (localización) / 7 (patches) | candidatos rankeados con desglose por señal; intentos de patch con diff, ruta y motivo de rechazo |
+| `dynamic` | paso 4 | `null` fuera de Android. Si no: `status` (`completed`/`blocked`/`skipped`), `blocked_reason`, el **piso de ruido** medido explorando la base dos veces, los diffs por pantalla y la cobertura por activity. **Columna aparte: no entra en ningún outcome ni en BSR/CTSR/FFSR** ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)) |
+| `structural` | paso 5 | **por archivo**: `impact_level` (0 no impactado / 1 transitivo / 2 directo), `propagated_from` (de qué archivo entró un transitivo), `rloc` (líneas reales) y `complexity_proxy`. Son los cuatro campos que alimentan sunburst, árbol de propagación y CodeCharta — **el `.cc.json` lo deriva el visor de aquí**, el pipeline no lo emite aparte: dos artefactos sobre el mismo caso pueden discrepar, y el que se mira sería el que nadie verifica. Más el modelo, en **dos mitades** ([ADR 0018](../../Kmp-Repair-Agents/docs/decisions/0018-build-files-are-nodes-in-the-structural-model.md)). *Código*: source-sets con `depends_on`/`targets`/`kind`, targets con su plataforma, links expect/actual, **`orphan_actuals[]`** (un `actual` sin su `expect` — suele significar que la actualización eliminó la declaración compartida). *Build*: **`build_nodes[]`** con `path`, `kind` (`version-catalog`/`module-script`/`properties`/`settings`/`wrapper`), `scope` y `declares`, más **`alias_edges[]`** (alias del catálogo → módulo que lo usa), que es lo que permite dibujar el catálogo y los scripts colgando de los módulos que configuran. **Se construyen siempre**, también en casos sin fallo de configuración. Ojo con el wrapper: su `scope` es **`GLOBAL`** y la vista tiene que pintarlo así — colgarlo de un módulo sería una dirección falsa. Y transversal: `extraction_layers[]` (con qué capas se construyó: sin Gradle vale menos), `structural_evidence[]` con `provenance` y `confidence`, y `partial: bool`. **`null` en un caso de build verde**: §4 es perezosa, así que un hallazgo de UI puede venir sin modelo estructural — y entonces se muestra **sin atribución a código**, nunca inventada |
+| `localization` | paso 5 (scorer) / 6 (agente) | candidatos rankeados **con desglose por señal** — es lo que deja ver *por qué* rankeó, y un acierto por la señal equivocada es invisible en un `Hit@1` y obvio acá. Más la procedencia del mapeo grupo-Maven → paquete-Kotlin y el contador de `unmapped`: una señal que no se pudo computar llega en **`None` y se pinta «no disponible»**, nunca como 0 — un peso en cero mueve el ranking |
+| `synthesis` | paso 7 | ruta de reparación elegida (source-level / build-level) y el diff unificado propuesto en cada intento, más el contador de llamadas a LLM. **Sin veredicto**: si el patch entró o no está en `application` |
+| `application` | paso 7 | por intento: aceptado/rechazado con el motivo del aplicador, y `downgrade_check` con **tres valores, no dos** — `OK`, `RECHAZADO` y `SKIPPED` con su razón. `SKIPPED` se pinta distinto de `OK`: «no pude comprobar» no puede verse igual que «comprobé y está bien» |
 | `validation` | paso 8 | matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level |
 | `explanation` | paso 9 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si vino del agente o del fallback |
 | `agent_calls` | paso 6 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
