@@ -29,6 +29,14 @@ la traía".
 Por eso el bundle lleva `schema_version` y `pipeline_git_sha`: un dump viejo se detecta y se
 rechaza en la frontera (`src/data.ts`), en vez de renderizarse mal en silencio.
 
+**Y el dump es una vista aplanada, no la forma en que el pipeline guarda.** Allá son cuatro tablas
+—`case` con las secciones en JSON, `probe` por target y revisión, `project_model` compartido por
+`repo@sha`, y un CAS por hash para logs, UTGs, prompts y respuestas
+([ADR 0026](../../Kmp-Repair-Agents/docs/decisions/0026-the-physical-shape-of-the-bundle.md))—.
+Dos consecuencias para la app: **la matriz de tres columnas llega ya armada** —allá es un `GROUP BY`
+sobre `probe`, acá es un campo— y **lo pesado llega como hash, no como contenido**: si una vista
+necesita el log crudo, lo pide por su hash, no espera encontrarlo en el JSON.
+
 ## Estructura
 
 ```
