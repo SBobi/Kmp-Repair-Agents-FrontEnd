@@ -55,7 +55,7 @@ cosas que un test unitario también atrapa, pero solo si alguien pensó en escri
 Pipeline: etapas Update + Execution sobre `worked_case` y `no_failure_case`, con `ScriptedRunner`.
 Primer `kmp-repair dump` real.
 
-**Ficha de caso**, la vista central, nueve secciones en el orden del Case Bundle. Las secciones que
+**Ficha de caso**, la vista central, ocho secciones en el orden del Case Bundle. Las secciones que
 el caso todavía no alcanzó se marcan **"no alcanzada"** con el estado que lo explica — nunca vacías
 ni omitidas en silencio. Dentro:
 
@@ -101,7 +101,10 @@ Pipeline: puerto `UiExplorer` con `DroidBotExplorer` y `FakeExplorer`, `assemble
 updated, y la base explorada **dos veces** para medir el piso de ruido
 ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)).
 
-**Vista Evidencia dinámica** (solo cuando el caso la tiene; `null` fuera de Android). El diff de
+**Vista Evidencia dinámica** (solo cuando el caso la tiene; `null` fuera de Android). Ojo: el
+`status` es **por revisión**, así que un caso puede tener la base explorada y `updated` bloqueada —
+es lo que pasa en los 37 de `configuration`, y esa base explorada es lo que hace posible la
+comparación del paso 8. El diff de
 exploración **con su piso de ruido al lado, siempre**: un diff de 3 pantallas sobre un piso de 4 no
 es una regresión, y mostrarlo sin el piso lo convertiría en una. Debajo, la cobertura por activity
 —cuántas veces se visitó cada pantalla—, que es lo que deja juzgar si una pantalla «ausente» lo
@@ -205,16 +208,17 @@ detrás de un `Hit@1`.
 
 ### Paso 7 — reparación: intentos de patch
 
-Pipeline: extracción determinista de versión antes que el agente + Repair Agent + aplicador
-atómico. **Sin bifurcación de ruta**: el patch cubre toda la lista de §5, mezclada o no
+Pipeline: extracción determinista de versión **como evidencia en el prompt** + Repair Agent, que
+entra siempre. **Sin bifurcación de ruta**: el patch cubre toda la lista de §5, mezclada o no
 ([ADR 0022](../../Kmp-Repair-Agents/docs/decisions/0022-the-list-decides-the-route.md)).
 
 **Vista Intentos.** Uno por intento, en orden: la etiqueta de qué tocó —`build-only` /
 `source-only` / `mixed`, **descriptiva y no una decisión**—, el **diff unificado** del patch
 (`DiffView` del Mining, con colapso para parches grandes),
-aceptado o rechazado **con el motivo del aplicador** (path fuera del workspace, hash de snapshot
-viejo, contexto de hunk que no casa, límite de tamaño, downgrade). Y el contador de llamadas a LLM,
-con los reintentos de formato contabilizados **aparte** del budget experimental.
+y el contador de llamadas a LLM, con los reintentos de formato contabilizados **aparte** del budget
+experimental. **El veredicto de si aplicó no es de este paso**: aplicar dejó de ser una etapa y es
+la compuerta de entrada del paso 8
+([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)).
 
 **La comparación que esta vista existe para hacer posible: la lista que dio §5 al lado de los
 archivos que §6 tocó de verdad.** Un archivo listado y no tocado se pinta **como tal, no como un
@@ -222,29 +226,36 @@ hueco** — es el momento 3 de la medición
 ([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)),
 y sin las dos columnas juntas no se ve nada de eso.
 
-La comprobación de downgrade tiene **tres** salidas y la vista las distingue: rechazado, OK, y
-`SKIPPED` con su motivo cuando no era comparable (un `reference-update` mueve shas, que no se
-ordenan). **`SKIPPED` no se dibuja como OK** — misma regla que `None` ≠ 0. Sobre el corpus el
-rechazo no dispara nunca (0 de 117 bumps), así que si aparece uno, es para mirarlo.
-
 *Probado:* que **la versión extraída del error llega al prompt del agente**, visible en la vista.
 El agente entra siempre ([ADR 0023](../../Kmp-Repair-Agents/docs/decisions/0023-the-agent-always-runs.md)):
 que el error nombre una versión no implica que ahí termine el impacto, y acá el modelo se usa como
 experto en parches, no como sustituidor de texto.
 
-**Ojo con el contador de llamadas: el piso son tres por caso** —§5, §6, §9—, y el panel no debe
+**Ojo con el contador de llamadas: el piso son tres por caso** —§5, §6, §8—, y el panel no debe
 esperar ceros en ninguna. Un caso con cero llamadas en cualquiera de las tres es un bug, no una
 optimización.
 
-### Paso 8 — validación multi-target
+### Paso 8 — probar: aplicar y validar
 
-Pipeline: re-corrida sobre workspace fresco con el patch re-aplicado, split remanente/nuevo,
-outcome repo-level.
+Pipeline: **compuerta de aplicación** (paths, hash, hunk, todo-o-nada) y luego la prueba de verdad
+— re-corrida sobre workspace fresco, DroidBot como tercera columna, split remanente/nuevo, outcome
+repo-level.
+
+**Vista Compuerta**, antes de la matriz: aplicó limpio o no, y por qué. Tres motivos con tres
+significados distintos que la vista **tiene** que separar: un path fuera del workspace es un
+**evento de seguridad**; un hash o un hunk que no casa es un **reintento**; y el downgrade **no
+rechaza nada** — se muestra como dato, con sus dos valores `OK` y `SKIPPED`, y quien lo explica es
+el paso 9 ([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)).
+Lo mismo el tamaño del patch: se marca, no bloquea.
 
 **Matriz de validación**: la misma rejilla, ahora con **tres columnas** — base / updated /
 post-patch. Debajo, cada `FailureObservation` clasificada como **resuelta / remanente / nueva
 (regresión)**, y el outcome repo-level derivado con su regla a la vista (`FULL_FIX` solo si *todos*
 los targets ejecutables pasan; `environment_unavailable` no cuenta ni a favor ni en contra).
+
+**Y las tres salidas se distinguen en pantalla**, porque cada una manda una pregunta distinta al
+paso 9: todo verde · rojo con el **mismo** error · rojo con un error **nuevo**. La tercera es una
+regresión y no puede verse como «medio arreglo».
 
 *Probado:* `regression_case` sale `REGRESSED` y se ve el error nuevo que lo causó, no un verde
 promediado. `ios_linkage_case` muestra compile verde y link rojo en el **mismo target** — la razón
@@ -252,7 +263,7 @@ por la que CTSR y BSR no son la misma métrica.
 
 ### Paso 9 — explicación
 
-Pipeline: renderer puro + Explanation Agent con fallback a plantilla.
+Pipeline: renderer puro + Explanation Agent, que entra siempre.
 
 **Vista Explicación**: el artefacto renderizado (Markdown al lado del JSON), con los **cuatro
 campos de la auditoría del paper separados y etiquetados** — identifica la entidad reparada,
@@ -349,7 +360,7 @@ nada.
 
 ```
 /#/                      índice de casos (paso 11; antes, la lista de lo que haya)
-/#/case/:owner/:name/:pr  ficha: las 9 secciones del Case Bundle
+/#/case/:owner/:name/:pr  ficha: las 8 secciones del Case Bundle
 /#/domain                 máquina de estados y taxonomía (paso 1)
 /#/eval                   grid, baselines, métricas (paso 10)
 ```
