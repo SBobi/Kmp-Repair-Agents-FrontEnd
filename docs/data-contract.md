@@ -47,13 +47,19 @@ con sus vueltas**: el dump se pide por caso, por caso+modo, o por caso+modo+vuel
   update, execution, dynamic, structural,     ← COMPARTIDAS por los cuatro modos
 
   runs: [ { mode, state, blocked, localization,            ← UNA POR MODO
-            workspace_sha, identical_resample_rate, metrics,
-            attempts: [ { turn, is_final,
+            workspace_sha, tree_degraded_to_direct,
+            identical_resample_rate, metrics,
+            attempts: [ { turn, state, is_final,
                           synthesis, validation, explanation } ],
-            agent_calls } ],
+            agent_calls: [ { turn, stage, ... } ] } ],   ← turn en CADA llamada
 
   catalog_origin, licence, warning }
 ```
+
+**`agent_calls` es plano dentro de la corrida y cada llamada lleva su `turn`** (`null` en las de
+§5, que corre una vez). La tabla tiene la vuelta en la llave; si el dump la aplana y la pierde, **la
+curva de coste por vuelta no se puede dibujar** — y esa curva es una de las dos lecturas que la
+vista de evaluación existe para hacer obvias.
 
 **`runs` es un array y eso no es un detalle**: un caso son **hasta cuatro corridas**, y el `dump`
 las trae todas. `mode = null` en una corrida única significa que el caso salió en §2 o §3 y ningún
@@ -91,7 +97,7 @@ Las ocho secciones centrales son, una a una, las
 |---|---|---|
 | `schema_version`, `generated_at`, `pipeline_git_sha` | paso 2 | procedencia; el sha permite trazar cualquier pantalla a una versión exacta del pipeline |
 | `case_key`, `resolved_key` | paso 2 | la llave tal como se pidió (`owner/name#pr` o `owner/name@base..head`) y la **resuelta**, siempre en forma `@base..head`. Las dos tienen que sobrevivir a una URL. Cuando difieren, la vista muestra a qué revisiones resolvió: un `#pr` no fija contenido y un PR reescrito resuelve distinto |
-| `stage_state` / `state` | paso 2 / 9c | **son dos**: `stage_state` es de §1-§4 y vive en el caso; `state` es por modo. Un caso puede estar `EVALUATED` en el modo 1 y `PATCHED` en el 4 ([ADR 0030](../../Kmp-Repair-Agents/docs/decisions/0030-six-tables-case-run-attempt.md) §1b). El estado alcanzado — es lo que explica cada sección ausente. **`EVALUATED` es el terminal y lo produce el pipeline**: significa «este caso terminó», **no** que saliera bien — el resultado es otro eje, igual que `VALIDATED` no dice `FULL_FIX` ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)). Un panel que cuente `EVALUATED` como éxitos está contando casos completos |
+| `stage_state` / `state` / `attempts[].state` | paso 2 / 9c / 9b | **son TRES máquinas** —`CaseState`, `RunState`, `AttemptState`— y ninguna comparte un valor con otra ([ADR 0030](../../Kmp-Repair-Agents/docs/decisions/0030-six-tables-case-run-attempt.md) §1b). El lazo vive en la tercera: `PATCHED → VALIDATED → EXPLAINED`, y de ahí a la vuelta siguiente o a `EVALUATED` de la corrida. Las dos primeras son **acíclicas**. Además: `stage_state` es de §1-§4 y vive en el caso; `state` es por modo. Un caso puede estar `EVALUATED` en el modo 1 y `PATCHED` en el 4 ([ADR 0030](../../Kmp-Repair-Agents/docs/decisions/0030-six-tables-case-run-attempt.md) §1b). El estado alcanzado — es lo que explica cada sección ausente. **`EVALUATED` es el terminal y lo produce el pipeline**: significa «este caso terminó», **no** que saliera bien — el resultado es otro eje, igual que `VALIDATED` no dice `FULL_FIX` ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)). Un panel que cuente `EVALUATED` como éxitos está contando casos completos |
 | `blocked` | paso 2 | `null` salvo que el estado sea `UNAVAILABLE` — **hay dos `blocked`**: el del caso (§1-§4) y el de la corrida (§5-§8), porque un proveedor caído deja indisponible **ese modo**, no el caso;; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
 | `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y **10 de los 94** casos traen entre 2 y 4 (3 con dos, 5 con tres, 2 con cuatro). `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión", y **no es hipotética: son 4 de los 94** —`Oztechan/CCC#2807` y `#4332`, `meshtastic/Meshtastic-Android#5212` y `#5676`, los cuatro `reference-update`—, así que una vista probada solo con listas no vacías se rompe en el 4 % del corpus. El bump primario es nullable y lo llena un paso posterior, nunca la ingesta. Cifras medidas sobre `paper_corpus_v1.db` el 2026-08-06 |
 | `execution` | paso 2 | probes por target y stage **con su nivel** (`configuration`, `compile`, `compile-test`, `link`, `test-run`), `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados, hash del log crudo en el `ArtifactStore`, y la comparación contra los probes del catálogo |
@@ -167,11 +173,17 @@ vueltas** del lazo §6→§7→§8, con su patch, su validación y su prosa cada
 de intentos es una lista desde el primer día, y **la comparación entre modos es lo que hay que ver,
 no un accesorio**: sobre 94 casos son hasta 376 corridas y 1 128 intentos.
 
-Dos reglas que salen de ahí:
+Cuatro reglas que salen de ahí:
 
 - **`localization` ausente en los modos 1-3 significa «este modo no tiene esa etapa», no «falta un
-  dato»** — el `mode` de la corrida lo dice, y la vista tiene que decirlo también. `walk` y
-  `files_read[]` **sí** llegan en los cuatro.
+  dato»** — el `mode` de la corrida lo dice, y la vista tiene que decirlo también. `exploration`
+  **sí** llega en los cuatro; `tree_walk` en los modos 2, 3 y 4.
+- **`identical_resample_rate` llega `null` en los modos 3 y 4, y también es por diseño**: su prompt
+  cambia entre vueltas, así que la cifra sería cero por definición. Se pinta `null`, nunca `0`, o
+  cuatro columnas con dos ceros estructurales invitan a leer una diferencia que no existe.
+- **`tree_degraded_to_direct` es de la corrida, no del caso**: si el árbol cabe depende del payload
+  de cada modo. Una corrida degradada recibió **solo el primer nivel** del árbol y no se promedia
+  con el resto.
 - **La explicación que se muestra como «la» explicación es la marcada `is_final`.** Las intermedias
-  existen y son insumo del lazo; pintarlas al mismo nivel haría creer que el caso produjo cinco
+  existen y son insumo del lazo; pintarlas al mismo nivel haría creer que el caso produjo tres
   informes.

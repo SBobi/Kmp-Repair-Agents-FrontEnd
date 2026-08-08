@@ -36,10 +36,14 @@ que dice honestamente "sin bundles todavía".
 
 ### Paso 1 — `domain/`: máquina de estados y taxonomía
 
-Pipeline: entidades del Case Bundle, `CaseState` con sus transiciones, las 5 clases de
+Pipeline: entidades del Case Bundle, **tres** máquinas de estados —`CaseState`, `RunState`,
+`AttemptState`— con sus transiciones, las 5 clases de
 `update_kind`. Dump: `kmp-repair schema-dump`.
 
-**Vista Domain.** El grafo de estados dibujado **desde el dump, no a mano**: nodos y aristas tal
+**Vista Domain.** Los **tres** grafos dibujados **desde el dump, no a mano**, y **las aristas entre
+ellos** —`CaseState.MODELED` abre N `RunState.STARTED`; `AttemptState.EXPLAINED` vuelve a `PATCHED`
+o cierra la corrida—. Esas aristas entre niveles son las que importan: es donde el diseño se
+equivocó dos veces, y un grafo por máquina no las habría enseñado. Nodos y aristas tal
 como el dominio las declara, con los caminos de escape marcados (`NO_REPAIR_NEEDED` y
 `NOT_REPRODUCED`, que se ven distintos porque significan lo contrario,
 `NO_SAFE_PATCH → EXPLAINED`, y `UNAVAILABLE`, alcanzable desde cualquier nodo, con la arista de
