@@ -29,30 +29,44 @@ la traía".
 Por eso el bundle lleva `schema_version` y `pipeline_git_sha`: un dump viejo se detecta y se
 rechaza en la frontera (`src/data.ts`), en vez de renderizarse mal en silencio.
 
-**Y el dump es una vista aplanada, no la forma en que el pipeline guarda.** Allá son cuatro tablas
-—`case` con las secciones en JSON, `probe` por target y revisión, `project_model` compartido por
-`repo@sha`, y un CAS por hash para logs, UTGs, prompts y respuestas
-([ADR 0026](../../Kmp-Repair-Agents/docs/decisions/0026-the-physical-shape-of-the-bundle.md))—.
-Dos consecuencias para la app: **la matriz de tres columnas llega ya armada** —allá es un `GROUP BY`
-sobre `probe`, acá es un campo— y **lo pesado llega como hash, no como contenido**: si una vista
-necesita el log crudo, lo pide por su hash, no espera encontrarlo en el JSON.
+**Y el dump es una vista aplanada, no la forma en que el pipeline guarda.** Allá son **seis tablas**
+en jerarquía —`case` con §1-§4 compartidas, `run` por modo con §5, `attempt` por vuelta con §6-§8,
+`probe` por target y revisión, `project_model` por `repo@sha`, y un CAS por hash para logs, UTGs,
+prompts y respuestas
+([ADR 0030](../../Kmp-Repair-Agents/docs/decisions/0030-six-tables-case-run-attempt.md))—.
+Tres consecuencias para la app: **la matriz de tres columnas llega ya armada** —allá es un `GROUP BY`
+sobre `probe`, acá es un campo—, **lo pesado llega como hash, no como contenido** —si una vista
+necesita el log crudo, lo pide por su hash—, y **un caso ya no es un documento sino cuatro corridas
+con sus vueltas**: el dump se pide por caso, por caso+modo, o por caso+modo+vuelta.
 
 ## Estructura
 
 ```
 { schema_version, generated_at, pipeline_git_sha,
   case_key, resolved_key, case_state, blocked,
-  update, execution, dynamic, structural,
-  localization, synthesis, validation, explanation,
+  update, execution, dynamic, structural,          ← COMPARTIDAS por los cuatro modos
+  mode, localization,                              ← de la corrida: mode identifica cuál
+  attempts: [ { turn, is_final,
+                synthesis, validation, explanation } ],
   agent_calls, catalog_origin, licence, warning }
 ```
 
-Las ocho del medio son **las ocho secciones del Case Bundle y ninguna más**, una por etapa del
-pipeline — [ADR 0017](../../Kmp-Repair-Agents/docs/decisions/0017-case-bundle-nine-sections.md), que
+**El dump se pide a tres granularidades**, porque la corrida ya no es una:
+`dump <case>` trae las cuatro secciones compartidas y las cuatro corridas; `dump <case> --mode
+<m>` trae una; `dump <case> --mode <m> --turn <n>` trae una vuelta. Las cuatro primeras secciones
+son **idénticas en las cuatro corridas** por construcción, y ésa es la garantía de que una
+diferencia entre modos es del modo.
+
+Las ocho del medio siguen siendo **las ocho secciones del Case Bundle y ninguna más**, una por etapa
+del pipeline — [ADR 0017](../../Kmp-Repair-Agents/docs/decisions/0017-case-bundle-nine-sections.md), que
 sustituye al [ADR 0002](../../Kmp-Repair-Agents/docs/decisions/0002-case-bundle-six-sections.md).
 
-**Cambió respecto a la forma anterior, y hay que leerlo con cuidado:** `ui_evidence` **ya no cuelga
-de `execution`** — es la sección de primer nivel `dynamic`. Y `repair` **ya no existe**: se partió en
+**Cambió respecto a la forma anterior, y hay que leerlo con cuidado:** las tres últimas secciones
+**ya no están sueltas en la raíz**: viven dentro de `attempts[]`, una por vuelta del lazo, con
+`is_final` marcando cuál explicación puntúa
+([ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md),
+[ADR 0030](../../Kmp-Repair-Agents/docs/decisions/0030-six-tables-case-run-attempt.md)). Y
+`ui_evidence` **ya no cuelga de `execution`** — es la sección de primer nivel `dynamic`. Y `repair` **ya no existe**: se partió en
 `localization` y `synthesis` —dónde y qué escribo—, mientras que **aplicar dejó de ser una sección**
 y pasó a ser la compuerta de entrada de `validation`, que es la que **prueba**
 ([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)).
@@ -74,13 +88,14 @@ Las ocho secciones centrales son, una a una, las
 | `blocked` | paso 2 | `null` salvo que `case_state` sea `UNAVAILABLE`; entonces `stage`, `reason`, `permanent` y el `message` **crudo**. Un caso que no se pudo traer o ejecutar no es un fallo de reparación: se dibuja como indisponible, jamás como rojo. `permanent: false` se muestra como recuperable, no como resultado ([ADR 0012](../../Kmp-Repair-Agents/docs/decisions/0012-unavailable-is-one-state.md)) |
 | `update` | paso 2 | `bumps[]` — cada uno con `label`, `from`, `to`, archivo y `update_kind` (5 valores: `direct`, `plugin-toolchain`, `platform-integration`, `reference-update`, `fallback`) — más `base_sha`/`head_sha` y el diff del bot. **Es una lista incluso cuando trae un solo elemento**, y **10 de los 94** casos traen entre 2 y 4 (3 con dos, 5 con tres, 2 con cuatro). `from`/`to` son **strings opacos**: `"8.1.2"` en un bump de versión, `"f30c8b7"` en uno de referencia — no se ordenan ni se parsean como semver en la vista. Una lista **vacía** significa que el diff no tocó ningún archivo de build reconocible, no "no hubo cambio de versión", y **no es hipotética: son 4 de los 94** —`Oztechan/CCC#2807` y `#4332`, `meshtastic/Meshtastic-Android#5212` y `#5676`, los cuatro `reference-update`—, así que una vista probada solo con listas no vacías se rompe en el 4 % del corpus. El bump primario es nullable y lo llena un paso posterior, nunca la ingesta. Cifras medidas sobre `paper_corpus_v1.db` el 2026-08-06 |
 | `execution` | paso 2 | probes por target y stage **con su nivel** (`configuration`, `compile`, `compile-test`, `link`, `test-run`), `FailureObservation[]` con rol causal, **texto de error real**, targets no ejecutables declarados, hash del log crudo en el `ArtifactStore`, y la comparación contra los probes del catálogo |
-| `dynamic` | paso 4 | `null` fuera de Android. Si no: **`status` es por revisión, no por caso** (`completed`/`blocked`/`skipped`) con su `blocked_reason` — en los 37 de `configuration` la base sale `completed` con su piso medido y solo `updated` sale `blocked`, así que la vista tiene que poder pintar una columna explorada y otra bloqueada en el mismo caso. Más el **piso de ruido** medido explorando la base dos veces, los diffs por pantalla y la cobertura por activity. **Columna aparte: no entra en ningún outcome ni en BSR/CTSR/FFSR** ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)) |
+| `dynamic` | paso 4 | `null` fuera de Android. Si no: **`status` es por revisión, no por caso** (`completed`/`blocked`/`skipped`) con su `blocked_reason` — en los 37 de `configuration` la base sale `completed` con su piso medido y solo `updated` sale `blocked`, así que la vista tiene que poder pintar una columna explorada y otra bloqueada en el mismo caso. Más el **piso de ruido** medido explorando la base dos veces, los diffs por pantalla y la cobertura por activity. **Columna aparte: no entra en ningún outcome ni en BSR/CTSR/FFSR** ([ADR 0015](../../Kmp-Repair-Agents/docs/decisions/0015-dynamic-ui-evidence-with-a-noise-floor.md)). **Pero sí viaja al modelo desde el [ADR 0027](../../Kmp-Repair-Agents/docs/decisions/0027-dynamic-evidence-travels-as-text.md), y solo en texto** —el error de ejecución y el diff por encima del piso—; las capturas y el UTG **no salen del CAS**, así que la vista los pide por hash y nunca los presenta como «lo que vio el modelo» |
 | `structural` | paso 5 | **`impact_tree[]`** es lo que de verdad importa acá: por nodo `relation` (`DIRECT`/`TRANSITIVE`/`EXPECT_ACTUAL`), `distance`, `propagated_from[]`, `imports_from_dependency[]`, más `seeds[]` con su procedencia (importadores de la dependencia · entidades del error de §2). Es **determinista y está entero**, así que la vista lo dibuja completo y encima se pinta el recorrido del paso 6. | **por archivo**: `impact_level` (0 no impactado / 1 transitivo / 2 directo), `propagated_from` (de qué archivo entró un transitivo), `rloc` (líneas reales) y `complexity_proxy`. Son los cuatro campos que alimentan sunburst, árbol de propagación y CodeCharta — **el `.cc.json` lo deriva el visor de aquí**, el pipeline no lo emite aparte: dos artefactos sobre el mismo caso pueden discrepar, y el que se mira sería el que nadie verifica. Más el modelo, en **dos mitades** ([ADR 0018](../../Kmp-Repair-Agents/docs/decisions/0018-build-files-are-nodes-in-the-structural-model.md)). *Código*: source-sets con `depends_on`/`targets`/`kind`, targets con su plataforma, links expect/actual, **`orphan_actuals[]`** (un `actual` sin su `expect` — suele significar que la actualización eliminó la declaración compartida). *Build*: **`build_nodes[]`** con `path`, `kind` (`version-catalog`/`module-script`/`properties`/`settings`/`wrapper`), `scope` y `declares`, más **`alias_edges[]`** (alias del catálogo → módulo que lo usa), que es lo que permite dibujar el catálogo y los scripts colgando de los módulos que configuran. **Se construyen siempre**, también en casos sin fallo de configuración. Ojo con el wrapper: su `scope` es **`GLOBAL`** y la vista tiene que pintarlo así — colgarlo de un módulo sería una dirección falsa. Y transversal: `extraction_layers[]` (con qué capas se construyó: sin Gradle vale menos), `structural_evidence[]` con `provenance` y `confidence`, y `partial: bool`. **`null` en un caso de build verde**: §4 es perezosa, así que un hallazgo de UI puede venir sin modelo estructural — y entonces se muestra **sin atribución a código**, nunca inventada |
-| `localization` | paso 6 | **`ranked_files[]`** — la lista que devolvió el agente, con `rank`, justificación y la marca **`off_tree`** en las que propuso sin haber recorrido (se aceptan si la ruta existe; solo se rechaza la inventada). **La longitud la elige él y es en sí una métrica**, así que va a la vista junto a los `Hit@k`. Más **`walk`**: `max_depth` (medido, no impuesto), **`files_read[]` — las rutas, no el conteo**, `nodes_offered`, `truncated` (lo cortó el presupuesto → se pinta distinto y no se promedia) y `off_tree_proposals`. **Todo son hechos: acá no viaja ninguna métrica.** Las tres exigen el ground truth, así que las deriva el evaluador y la app las recibe ya calculadas o no las recibe ([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)). **No hay scorer ni desglose por señal** ([ADR 0019](../../Kmp-Repair-Agents/docs/decisions/0019-the-agent-localizes-over-a-deterministic-tree.md)) |
-| `synthesis` | paso 7 | `attempts[]` con el **diff unificado** de cada intento —**uno solo sobre todos los archivos que el agente eligió tocar**— y los archivos efectivamente tocados. Ojo con dos cosas al dibujarlo: **un archivo que §5 listó y §6 no tocó NO es un error** —es lo que mide el momento 3—, y `touched_label` (`build-only`/`source-only`/`mixed`) es **descriptiva, no una decisión de ruta** ([ADR 0022](../../Kmp-Repair-Agents/docs/decisions/0022-the-list-decides-the-route.md)). Más `min_version_hint` y `list_capped`. **Sin veredicto**: si el patch entró o no está en `application` |
+| `mode` | paso 10 | cuál de los cuatro produjo esta corrida: `raw_error`, `context_rich`, `iterative_agentic`, `full_pipeline`. **Es lo que explica una sección ausente**: `localization` en `null` con `mode` distinto de `full_pipeline` significa **«este modo no tiene esa etapa»**, no «falta un dato» ([ADR 0028](../../Kmp-Repair-Agents/docs/decisions/0028-four-modes-and-on-demand-exploration.md)) |
+| `localization` | paso 6 | **Solo en el modo 4**, y **`walk` llega en los cuatro** porque los cuatro exploran bajo demanda y **sin tope de lecturas**. **`ranked_files[]`** — la lista que devolvió el agente, con `rank`, justificación y la marca **`off_tree`** en las que propuso sin haber recorrido (se aceptan si la ruta existe; solo se rechaza la inventada). **La longitud la elige él y es en sí una métrica**, así que va a la vista junto a los `Hit@k`. Más **`walk`**: `max_depth` (medido, no impuesto), **`files_read[]` — las rutas, no el conteo**, `nodes_offered`, `truncated` (**se acabó la ventana de contexto** → se pinta distinto y no se promedia) y `off_tree_proposals`. **Todo son hechos: acá no viaja ninguna métrica.** Las tres exigen el ground truth, así que las deriva el evaluador y la app las recibe ya calculadas o no las recibe ([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)). **No hay scorer ni desglose por señal** ([ADR 0019](../../Kmp-Repair-Agents/docs/decisions/0019-the-agent-localizes-over-a-deterministic-tree.md)) |
+| `synthesis` | paso 7 | `attempts[]` con el **diff unificado** de cada intento —**uno solo sobre todos los archivos que el agente eligió tocar**— y los archivos efectivamente tocados. Ojo con dos cosas al dibujarlo: **un archivo que §5 listó y §6 no tocó NO es un error** —es lo que mide el momento 3—, y `touched_label` (`build-only`/`source-only`/`mixed`) es **descriptiva, no una decisión de ruta** ([ADR 0022](../../Kmp-Repair-Agents/docs/decisions/0022-the-list-decides-the-route.md)). Más `min_version_hint` y `list_capped`. **Sin veredicto**: si el patch entró o no lo dice `validation`, que es la que **prueba** — `application` no existe ([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)). **Y hay una por vuelta, dentro de `attempts[]`**: la vista pinta la evolución, no el último |
 | `validation` | paso 8 | **el resultado de PROBAR.** Primero la compuerta de entrada: aplicó limpio o no, y por qué (path fuera del workspace = rechazo duro; hash o hunk = reintento; todo-o-nada sobre el conjunto, **siempre**). Luego matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level y la tercera columna dinámica post-patch. Más `downgrade_check` con **dos** valores, `OK` y `SKIPPED`: **un downgrade no bloquea** — se detecta y lo explica la etapa siguiente, así que la vista lo muestra como dato, nunca como rechazo ([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)). Y el tamaño del patch se **marca**, no rechaza |
-| `explanation` | paso 9 | artefacto JSON + Markdown, los 4 campos de auditoría separados, y si la prosa vino del agente o llega **marcada como ausente** — en ese caso el artefacto es **no auditable**, no cuatro noes. **Presente también en casos sin patch**: `NOT_REPRODUCED`, `NO_REPAIR_NEEDED` y `NO_SAFE_PATCH` traen explicación ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)); un `UNAVAILABLE` permanente no, y eso es correcto |
-| `agent_calls` | paso 6 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia |
+| `explanation` | paso 9 | **una por vuelta, y solo la marcada `is_final` es «la» explicación** — las intermedias son insumo del lazo y pintarlas al mismo nivel haría creer que el caso produjo tres informes ([ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md)). Artefacto JSON + Markdown, los 4 campos de auditoría separados, y si la prosa vino del agente o llega **marcada como ausente** — en ese caso el artefacto es **no auditable**, no cuatro noes. **Presente también en casos sin patch**: `NOT_REPRODUCED`, `NO_REPAIR_NEEDED` y `NO_SAFE_PATCH` traen explicación ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)); un `UNAVAILABLE` permanente no, y eso es correcto |
+| `agent_calls` | paso 6 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia. **Cuál vuelta lo produjo importa**: el techo son 21 llamadas por caso sumando los cuatro modos. Y en los modos 1 y 2 la temperatura tiene que ser **> 0** o las tres muestras son la misma respuesta |
 | `catalog_origin` | paso 11 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
 | `licence` | paso 11 | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
 | `warning` | paso 7 | el aviso experimental **del parche generado** —`GeneratedPatch.warning`, que empieza *«Generated automatically by a research experiment…»*—, **renderizado tal cual llega** y nunca reescrito por la app. **No es el aviso del corpus**: `notice.experimental_use_only` habla de las reparaciones humanas minadas, y son dos sujetos distintos que el minado mantiene separados a propósito (A18/A30). Más `experimental_only: true` y `maintainer_reviewed: false` legibles por máquina, para que un script que consuma el dump llegue a la misma conclusión que quien lee la página |
@@ -136,6 +151,19 @@ Límites duros, no pendientes de UI:
 ser igual de grande, o rechazado justamente por el límite de tamaño del aplicador. El `DiffView`
 colapsa por parche, igual que en el Mining.
 
-**Que haya un solo intento.** `AttemptPolicy` puede ser `FIXED_N` o `ADAPTIVE_PROGRESS`: la vista
-de intentos es una lista, no un objeto único, desde el primer día — incluso mientras el pipeline
-solo produzca uno.
+**Que haya un solo intento, ni una sola corrida.** Cada caso corre en **cuatro modos**
+—`raw_error`, `context_rich`, `iterative_agentic`, `full_pipeline`— y cada modo da **hasta cinco
+vueltas** del lazo §6→§7→§8, con su patch, su validación y su prosa cada una
+([ADR 0028](../../Kmp-Repair-Agents/docs/decisions/0028-four-modes-and-on-demand-exploration.md),
+[ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md)). La vista
+de intentos es una lista desde el primer día, y **la comparación entre modos es lo que hay que ver,
+no un accesorio**: sobre 94 casos son hasta 376 corridas y 1 128 intentos.
+
+Dos reglas que salen de ahí:
+
+- **`localization` ausente en los modos 1-3 significa «este modo no tiene esa etapa», no «falta un
+  dato»** — el `mode` de la corrida lo dice, y la vista tiene que decirlo también. `walk` y
+  `files_read[]` **sí** llegan en los cuatro.
+- **La explicación que se muestra como «la» explicación es la marcada `is_final`.** Las intermedias
+  existen y son insumo del lazo; pintarlas al mismo nivel haría creer que el caso produjo cinco
+  informes.

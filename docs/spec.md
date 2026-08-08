@@ -187,7 +187,7 @@ cuarenta se ve de un vistazo; una tabla de doce filas no.
 Al lado, los números del recorrido y la lista rankeada con su justificación por archivo. Tres cosas
 que la vista **tiene** que distinguir:
 
-- **`truncated`** — el presupuesto de lecturas lo cortó. Terminar porque quiso no puede verse igual
+- **`truncated`** — se acabó la **ventana de contexto** (no hay tope de lecturas nuestro). Terminar porque quiso no puede verse igual
   que quedarse sin presupuesto, misma regla que `⊘` y que `downgrade_check: SKIPPED`.
 - **`off_tree`** — el agente propuso un archivo que **no recorrió**. Se acepta si la ruta existe en
   el repositorio; solo se rechaza la inventada. Es una afirmación más débil que una propuesta leída,
@@ -294,10 +294,17 @@ lado contradice se ve inmediatamente.
 
 ### Paso 10 — evaluación: el grid
 
-Pipeline: `EvidenceProfile × AttemptPolicy`, los 5 baselines, las métricas.
+Pipeline: los **cuatro modos** —`raw_error`, `context_rich`, `iterative_agentic`,
+`full_pipeline`— y las métricas. `EvidenceProfile × AttemptPolicy` ya no existe: **el modo es el
+eje** ([ADR 0028](../../Kmp-Repair-Agents/docs/decisions/0028-four-modes-and-on-demand-exploration.md)),
+y `BOT_ONLY` no es un baseline sino el corpus.
 
-**Vista Evaluación**: heatmap del grid (4 perfiles × 3 políticas) por métrica, y la comparación de
-baselines. Reglas duras heredadas del protocolo:
+**Vista Evaluación**: la rejilla **modo × vuelta** por métrica —cuatro modos, hasta tres vueltas—,
+no un heatmap de dos ejes de configuración. Lo que hay que poder leer de un vistazo son dos cosas
+([ADR 0031](../../Kmp-Repair-Agents/docs/decisions/0031-hit-at-three-levels-and-per-turn.md)):
+**la columna de la vuelta 1**, donde los cuatro modos son comparables sin salvedad porque ninguno ha
+usado realimentación, y **la pendiente de cada fila**, que es el valor del lazo medido contra el
+mismo modo. Reglas duras heredadas del protocolo:
 
 - Una métrica `None` se pinta **`None`, nunca 0** — un caso sin ground truth no es un caso con
   Hit@k cero. Y hay un `None` **estructural** que la app va a ver todo el tiempo: las métricas de
