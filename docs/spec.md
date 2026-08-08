@@ -205,23 +205,36 @@ detrás de un `Hit@1`.
 
 ### Paso 7 — reparación: intentos de patch
 
-Pipeline: ruta build-level (extracción determinista de versión antes que el agente) + Repair Agent
-para source-level + aplicador atómico.
+Pipeline: extracción determinista de versión antes que el agente + Repair Agent + aplicador
+atómico. **Sin bifurcación de ruta**: el patch cubre toda la lista de §5, mezclada o no
+([ADR 0022](../../Kmp-Repair-Agents/docs/decisions/0022-the-list-decides-the-route.md)).
 
-**Vista Intentos.** Uno por intento, en orden: la ruta elegida (source-level / build-level) y por
-qué, el **diff unificado** del patch (`DiffView` del Mining, con colapso para parches grandes),
+**Vista Intentos.** Uno por intento, en orden: la etiqueta de qué tocó —`build-only` /
+`source-only` / `mixed`, **descriptiva y no una decisión**—, el **diff unificado** del patch
+(`DiffView` del Mining, con colapso para parches grandes),
 aceptado o rechazado **con el motivo del aplicador** (path fuera del workspace, hash de snapshot
 viejo, contexto de hunk que no casa, límite de tamaño, downgrade). Y el contador de llamadas a LLM,
 con los reintentos de formato contabilizados **aparte** del budget experimental.
+
+**La comparación que esta vista existe para hacer posible: la lista que dio §5 al lado de los
+archivos que §6 tocó de verdad.** Un archivo listado y no tocado se pinta **como tal, no como un
+hueco** — es el momento 3 de la medición
+([ADR 0021](../../Kmp-Repair-Agents/docs/decisions/0021-localization-is-measured-in-three-moments.md)),
+y sin las dos columnas juntas no se ve nada de eso.
 
 La comprobación de downgrade tiene **tres** salidas y la vista las distingue: rechazado, OK, y
 `SKIPPED` con su motivo cuando no era comparable (un `reference-update` mueve shas, que no se
 ordenan). **`SKIPPED` no se dibuja como OK** — misma regla que `None` ≠ 0. Sobre el corpus el
 rechazo no dispara nunca (0 de 117 bumps), así que si aparece uno, es para mirarlo.
 
-*Probado:* `toolchain_case` debe resolverse con **0 llamadas a LLM** y eso se lee en pantalla. Si
-marca 1, la extracción determinista de versión mínima no está entrando y el ADR 0004 está roto en
-la práctica aunque los tests pasen.
+*Probado:* que **la versión extraída del error llega al prompt del agente**, visible en la vista.
+El agente entra siempre ([ADR 0023](../../Kmp-Repair-Agents/docs/decisions/0023-the-agent-always-runs.md)):
+que el error nombre una versión no implica que ahí termine el impacto, y acá el modelo se usa como
+experto en parches, no como sustituidor de texto.
+
+**Ojo con el contador de llamadas: el piso son tres por caso** —§5, §6, §9—, y el panel no debe
+esperar ceros en ninguna. Un caso con cero llamadas en cualquiera de las tres es un bug, no una
+optimización.
 
 ### Paso 8 — validación multi-target
 
@@ -249,7 +262,11 @@ revisores externos ni participantes — ver
 [evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)). Exporta el CSV de auditoría
 (`case_id` + 4 columnas sí/no).
 
-Cuando la narrativa vino del fallback determinista y no del agente, la vista lo indica.
+**Si la prosa no vino del agente, la vista lo dice y no la disfraza.** El agente se llama siempre
+([ADR 0023](../../Kmp-Repair-Agents/docs/decisions/0023-the-agent-always-runs.md)); si falló, el
+artefacto existe igual con los hechos duros y la narrativa **marcada como ausente**. Una plantilla
+interpolada presentada como si fuera la explicación del agente haría incomparable la auditoría de
+desarrollador: los cuatro criterios se evaluarían sobre textos de naturaleza distinta.
 
 *Probado:* que el agente **no puede alterar un resultado de validación**. La vista pone la prosa al
 lado de los hechos duros que la originaron; una explicación que afirme algo que la matriz de al
