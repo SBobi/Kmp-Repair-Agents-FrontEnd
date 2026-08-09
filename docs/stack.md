@@ -66,9 +66,22 @@ del índice son barras y un donut — SVG a mano, mismo camino que `FamilyDonut`
 o D3 para eso pesan más que lo que ahorran.
 → Reconsiderar si aparece una visualización con ejes, escalas y zoom de verdad.
 
-**Sin diagrama generado por librería para la máquina de estados** (paso 1). Los estados son menos
-de una docena y las transiciones son fijas: un layout en columnas por fase con flechas SVG alcanza.
-→ Una librería de grafos el día que el dominio tenga transiciones que se crucen de forma ilegible.
+**Sin diagrama generado por librería para las máquinas de estados** (paso 1). **Son tres, no una**
+—`CaseState`, `RunState`, `AttemptState`— y suman dieciséis estados
+([schema.md](../../Kmp-Repair-Agents/docs/schema.md) § «Las tres máquinas de estados»).
+
+**Y la condición de reconsiderar esto se disparó, así que hay que responderla en vez de dejarla
+puesta.** Decía *«una librería de grafos el día que el dominio tenga transiciones que se crucen de
+forma ilegible»*, y hoy hay dos cosas que no había: **un ciclo** —el lazo, en `AttemptState`— y
+**flechas entre niveles**.
+
+**Sigue alcanzando, y por eso concreto:** las tres máquinas se apilan en tres columnas, el ciclo es
+**una** flecha de retorno dentro de la tercera, y las inter-nivel son flechas de una columna a la
+siguiente. Nada se cruza — la jerarquía `case → run → attempt` es la que ordena el layout, y es la
+misma que ordena las tablas. Un motor de grafos elegiría un layout peor, porque no sabe que hay
+niveles.
+→ Se reconsidera si aparece una cuarta máquina, o si una flecha tuviera que ir hacia atrás entre
+columnas.
 
 ## Verificación
 
@@ -83,7 +96,10 @@ Como mínimo, lo que debe fallar si algo se rompe:
 - toda sección ausente está justificada por el estado (`stage_state` del caso o `state` de la corrida) — no hay huecos sin explicación;
 - ningún `environment_unavailable` aparece contado como fallo en un agregado;
 - ninguna métrica `None` se serializa como `0`;
-- la lista de intentos de patch es una lista, aunque traiga un solo elemento;
+- **las dos listas son listas**, aunque traigan un solo elemento: `runs` —un caso que salió en §2 o
+  §3 trae una sola corrida, con `mode = null`— y `runs[].attempts` —una corrida que salió verde a la
+  primera trae una sola vuelta—. Es la forma que más va a aparecer al principio y la que se colapsa
+  a objeto sin querer;
 - ida y vuelta filtros → `URLSearchParams` → filtros sin pérdida.
 
 Sin tests de render por componente, sin mocks del dump: se prueba contra un dump real de fixture,
