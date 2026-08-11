@@ -110,8 +110,15 @@ ni omitidas en silencio. Dentro:
 secciones siguientes "no alcanzadas". Si la ficha lo pinta como un caso normal a medio hacer, el
 atajo está mal implementado.
 
+*Y desde el paso 3b hay además un caso ad-hoc de verdad.* `kmp-repair ingest --git` emite la misma
+ficha leyendo git en vez del catálogo, y el índice lo trae al lado del mismo caso venido de los 94:
+**mismos bumps, y `catalog_origin`, `licence` y `catalog_contrast` ausentes**. Es lo que va a
+producir un repositorio que nunca estuvo en el corpus, y hasta ahora solo se ejercitaba con
+fixtures escritos a mano — que prueban que la vista dibuja lo que le escribimos, no lo que el
+pipeline emite.
+
 *Y desde el 2026-08-11 la ficha se mira contra los 94, no contra dos fixtures.* §1 corre sobre el
-catálogo entero sin red ni builds, así que el índice trae 96 casos y la ficha se ejercita contra
+catálogo entero sin red ni builds, así que el índice trae 97 casos y la ficha se ejercita contra
 formas reales: los 13 multi-bump, los 5 con `reference-update`, el que mezcla una versión con dos
 punteros de submódulo. Es la lección de la campaña de minado aplicada tres pasos antes — y ya
 cobró: un check de frontera daba por hecho que todo bundle trae `execution`, y se rompió al llegar

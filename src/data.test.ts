@@ -170,6 +170,22 @@ describe("los 94 del corpus", () => {
       expect(bundle.update!.catalog_contrast).toBeNull();
   });
 
+  it("el caso ad-hoc y el del catálogo dibujan el mismo §1 sobre el mismo caso", () => {
+    // El criterio de cierre del paso 3b, del lado de la vista. El ad-hoc salió de `git diff` y
+    // el otro de la columna `dependency_diff`: si la ficha se viera distinta, la vista estaría
+    // mostrando de dónde vino el dato en vez de qué dice.
+    const adhoc = bundles.find((b) => b.case_key === "Oztechan/CCC@0d8bee72..94fb90fc")!;
+    const fromCatalog = bundles.find((b) => b.case_key === adhoc.resolved_key)!;
+    expect(adhoc.update!.bumps).toEqual(fromCatalog.update!.bumps);
+    // Y lo que sí cambia, que es justo lo que la vista tiene que saber pintar como ausencia:
+    // sin catálogo no hay procedencia, ni licencia, ni contraste. Ninguno es un cero.
+    expect(adhoc.case_id).toBeNull();
+    expect(adhoc.catalog_origin).toBeNull();
+    expect(adhoc.licence).toBeNull();
+    expect(adhoc.update!.catalog_contrast).toBeNull();
+    expect(fromCatalog.update!.catalog_contrast!.agrees).toBe(true);
+  });
+
   it("ninguna lista de bumps sale vacía, y ninguno usa la forma #pr", () => {
     // `model_input` no tiene columna `pr_number`: los 94 llevan siempre @base..head.
     for (const bundle of corpus) {

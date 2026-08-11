@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-11T16:07:02+00:00",
+  "pipeline_git_sha": "4982017d3467258fb25a1648c55934604dae9a5a",
+  "case_key": "Oztechan/CCC@0d8bee72..94fb90fc",
+  "resolved_key": "Oztechan/CCC@0d8bee72fd6487474c3afea268db8e64df31dbe8..94fb90fc6e04f4c6793a95994f2839ee75715c53",
+  "case_id": null,
+  "stage_state": "INGESTED",
+  "blocked": null,
+  "update": {
+    "bumps": [
+      {
+        "label": "androidGradlePlugin",
+        "from": "8.1.2",
+        "to": "8.1.3",
+        "file": "gradle/libs.versions.toml",
+        "update_kind": "plugin-toolchain"
+      }
+    ],
+    "base_sha": "0d8bee72fd6487474c3afea268db8e64df31dbe8",
+    "head_sha": "94fb90fc6e04f4c6793a95994f2839ee75715c53",
+    "primary_bump": null,
+    "catalog_contrast": null
+  },
+  "execution": null,
+  "dynamic": null,
+  "structural": null,
+  "runs": [],
+  "catalog_origin": null,
+  "licence": null,
+  "warning": null
+}

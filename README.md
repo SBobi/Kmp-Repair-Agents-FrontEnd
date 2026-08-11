@@ -12,9 +12,12 @@ Importa un JSON y lo dibuja — mismo contrato que
 ## Estado
 
 **Dos vistas: `/#/domain` y la ficha de caso.** El dominio —las tres máquinas, las aristas entre
-niveles y la taxonomía— y **96 casos**: los 94 del corpus con §1, más dos fixtures con §1 y §2.
+niveles y la taxonomía— y **97 casos**: los 94 del corpus con §1, dos
+fixtures con §1 y §2, y **un caso ad-hoc que salió de git**, no de una columna.
 Todo desde el dump, ninguna cifra escrita a mano. Los 94 llegan con `stage_state: INGESTED` y sus
-otras siete secciones marcadas «no alcanzada» — §2 necesita Gradle real, que es el paso 3. La app se construye en paralelo al pipeline, una vista por paso: ver
+otras siete secciones marcadas «no alcanzada» — §2 necesita Gradle real, que es el paso 3c. El
+ad-hoc es el mismo caso que uno de los 94 y por eso vale: mismos bumps, y sin catálogo detrás.
+La app se construye en paralelo al pipeline, una vista por paso: ver
 [docs/spec.md](docs/spec.md) y el
 [roadmap del pipeline](../Kmp-Repair-Agents/docs/roadmap.md).
 
@@ -41,12 +44,14 @@ kmp-repair schema-dump                     > $F/schema.json
 kmp-repair demo --fixture worked_case      > $F/bundle.worked_case.json
 kmp-repair demo --fixture no_failure_case  > $F/bundle.no_failure_case.json
 kmp-repair ingest                          > $F/corpus.json   # §1 sobre los 94, sin red
+kmp-repair ingest --git Oztechan/CCC@0d8bee72..94fb90fc > $F/bundle.adhoc_case.json
 ```
 
-**Los cuatro se versionan**: sin ellos `npm run build` no pasa el type-check en un clone limpio, y
-un dump estático es el mejor fixture posible. `corpus.json` se regenera con un comando y **no
-depende de red** —`dependency_diff` es una columna del catálogo—, pero sí de que
-`data/corpus/model_input_v1.db` esté copiado a mano en el repo del pipeline (ADR 0001).
+**Los cinco se versionan**: sin ellos `npm run build` no pasa el type-check en un clone limpio, y
+un dump estático es el mejor fixture posible. `corpus.json` y el ad-hoc se regeneran con un
+comando; el primero **no depende de red** —`dependency_diff` es una columna del catálogo—, pero sí de que
+`data/corpus/model_input_v1.db` esté copiado a mano en el repo del pipeline (ADR 0001). El ad-hoc
+tampoco usa red, pero sí los mirrors bare de la campaña de minado.
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
 [docs/data-contract.md](docs/data-contract.md). Qué lo produce y por qué contiene eso, en el repo

@@ -5,6 +5,7 @@
 // paso del roadmap, así que acá se falla ruidosamente con uno que esta app no reconoce en vez
 // de renderizar secciones a medias.
 
+import adhocJson from "../data/bundle.adhoc_case.json";
 import noFailureJson from "../data/bundle.no_failure_case.json";
 import workedJson from "../data/bundle.worked_case.json";
 import corpusJson from "../data/corpus.json";
@@ -90,12 +91,20 @@ export function checkBundle(candidate: Bundle): Bundle {
 }
 
 /**
- * Los dos fixtures (§1 + §2) y los 94 del corpus (§1 sola: §2 necesita Gradle real).
- * Que convivan no confunde porque el bundle se autodescribe: `case_id` null es ad-hoc.
+ * Los dos fixtures (§1 + §2), **un caso ad-hoc de verdad** y los 94 del corpus (§1 sola: §2
+ * necesita Gradle real). Que convivan no confunde porque el bundle se autodescribe: `case_id`
+ * null es ad-hoc.
+ *
+ * El ad-hoc no está escrito a mano: lo emite `kmp-repair ingest --git` leyendo git, sin abrir el
+ * catálogo (paso 3b). Es el mismo caso que uno de los 94 y **por eso vale**: en la vista se ven
+ * los mismos bumps con `catalog_origin` y `catalog_contrast` ausentes, que es lo que un caso que
+ * nunca estuvo en el corpus va a producir. Un fixture escrito a mano probaría que la vista dibuja
+ * lo que le escribimos; éste prueba que dibuja lo que el pipeline emite.
  */
 export const bundles: Bundle[] = [
   workedJson as Bundle,
   noFailureJson as Bundle,
+  adhocJson as Bundle,
   ...(corpusJson as Bundle[]),
 ].map(checkBundle);
 
