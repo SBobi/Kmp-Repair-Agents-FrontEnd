@@ -5,8 +5,9 @@ y no se produce aquí.**
 
 ```bash
 # en ../Kmp-Repair-Agents
-kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
-kmp-repair dump --all    > ../Kmp-Repair-Agents-FrontEnd/data/bundles.json   # desde el paso 11
+kmp-repair demo --fixture <f> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.<f>.json
+kmp-repair ingest             > ../Kmp-Repair-Agents-FrontEnd/data/corpus.json
+kmp-repair dump <case-key>    # desde el paso 3, cuando SQLite persista entre procesos
 ```
 
 Todo lo que decide **qué contiene** un Case Bundle vive en el repo del pipeline:
@@ -19,10 +20,10 @@ Es el mismo reparto que en el minado: el visor de allá documenta la forma del m
 reglas que lo llenan viven en `Kmp-Repair-Mining`
 ([ADR 0010](../../../MINING/Kmp-Repair-Mining/docs/decisions/0010-second-review-belongs-to-the-corpus.md)).
 
-## Son dos artefactos, y este documento describe uno
+## Son dos formas de artefacto, y este documento describe una
 
-`kmp-repair` emite **dos** archivos y la app importa los dos. Este documento es el de `dump`, el del
-caso. El otro es `schema-dump`:
+`kmp-repair` emite el **dominio** —una vez, `schema-dump`— y **casos**, en los archivos que haga
+falta. Este documento describe el caso:
 
 | archivo | qué trae | de qué es función | ¿se versiona? |
 |---|---|---|---|
@@ -139,8 +140,8 @@ Las ocho secciones centrales son, una a una, las
 | `validation` | paso 8 | **el resultado de PROBAR.** Primero la compuerta de entrada: aplicó limpio o no, y por qué (path fuera del workspace = rechazo duro; hash o hunk = reintento; todo-o-nada sobre el conjunto, **siempre**). Luego matriz target × outcome, split resuelto/remanente/nuevo, outcome repo-level y la tercera columna dinámica post-patch. Más `downgrade_check` con **dos** valores, `OK` y `SKIPPED`: **un downgrade no bloquea** — se detecta y lo explica la etapa siguiente, así que la vista lo muestra como dato, nunca como rechazo ([ADR 0024](../../Kmp-Repair-Agents/docs/decisions/0024-applying-is-not-a-stage-testing-is.md)). Y el tamaño del patch se **marca**, no rechaza |
 | `explanation` | paso 9 | **una por vuelta, y solo la marcada `is_final` es «la» explicación** — las intermedias son insumo del lazo y pintarlas al mismo nivel haría creer que el caso produjo tres informes ([ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md)). Artefacto JSON + Markdown, los 4 campos de auditoría separados, y si la prosa vino del agente o llega **marcada como ausente** — en ese caso el artefacto es **no auditable**, no cuatro noes. **Presente también en casos sin patch**: `NOT_REPRODUCED`, `NO_REPAIR_NEEDED` y `NO_SAFE_PATCH` traen explicación ([ADR 0025](../../Kmp-Repair-Agents/docs/decisions/0025-how-a-case-ends.md)); un `UNAVAILABLE` permanente no, y eso es correcto |
 | `agent_calls` | paso 6 | uno por llamada a LLM: backend, versión de prompt, parámetros de decoding, **hash** de prompt/respuesta, tokens, latencia. **Cuál vuelta lo produjo importa**: el techo son 21 llamadas por caso sumando los cuatro modos. Y en los modos 1 y 2 la temperatura tiene que ser **> 0** o las tres muestras son la misma respuesta |
-| `catalog_origin` | paso 11 | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
-| `licence` | paso 11 | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
+| `catalog_origin` | **paso 2** (era paso 11) | `null` si el caso no vino del corpus; si vino: `corpus_version`, `case_id`, `ground_truth_files`, `environment_fingerprint`, `licence` y `base_commit_date`. **`ground_truth_files` solo aparece después de congelar la salida** — el dump es post-corrida, así que no rompe A07, pero el orden es parte del control ([evaluation-protocol.md](../../Kmp-Repair-Agents/docs/evaluation-protocol.md)) |
+| `licence` | **paso 2** (era paso 11) | `spdx`, `resolved_at`, `url`, **`local_text` y `local_text_sha256`** — la misma forma que ya emite el manifiesto público del minado, hash incluido: un archivo de licencia ausente se nota y uno desactualizado no, así que el sitio compara los bytes que sirve contra los que el corpus auditó. El enlace no basta: es el defecto que el visor del minado tuvo durante meses y que A04/A17 corrigieron —un enlace no conserva copyright, condiciones ni descargos, y resuelve al repositorio de hoy, no al del `base_sha`—. El texto viaja con el sitio y el enlace queda como secundario. `spdx` es la expresión exacta: `GPL-3.0` a secas se rechaza (A05) |
 | `warning` | paso 7 | el aviso experimental **del parche generado** —`GeneratedPatch.warning`, que empieza *«Generated automatically by a research experiment…»*—, **renderizado tal cual llega** y nunca reescrito por la app. **No es el aviso del corpus**: `notice.experimental_use_only` habla de las reparaciones humanas minadas, y son dos sujetos distintos que el minado mantiene separados a propósito (A18/A30). Más `experimental_only: true` y `maintainer_reviewed: false` legibles por máquina, para que un script que consuma el dump llegue a la misma conclusión que quien lee la página |
 
 ## Cuatro tipos de ausencia distintos

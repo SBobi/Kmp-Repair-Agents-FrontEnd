@@ -9,7 +9,6 @@ import {
   bundles,
   checkBundle,
   checkSchema,
-  isProvisionalExit,
   rowOf,
   schema,
 } from "./data";
@@ -62,13 +61,16 @@ describe("la frontera del bundle", () => {
     expect(() => checkBundle({ ...bundles[0], blocked })).toThrow(SchemaContractError);
   });
 
-  it("las cuatro secciones que ninguna etapa produce viajan PRESENTES y en null", () => {
+  it("las secciones que ninguna etapa produce viajan PRESENTES y en null", () => {
     // Omitirlas haría indistinguible «el caso no llegó ahí» de «esta versión no la traía».
     for (const bundle of bundles) {
-      for (const section of ["dynamic", "structural", "catalog_origin", "licence"] as const) {
+      for (const section of ["dynamic", "structural", "warning"] as const) {
         expect(section in bundle, section).toBe(true);
         expect(bundle[section]).toBeNull();
       }
+      // `catalog_origin` y `licence` son la excepción y por eso van aparte: no son etapas, son
+      // procedencia. Están pobladas desde el momento en que el caso viene del catálogo.
+      expect("catalog_origin" in bundle).toBe(true);
     }
   });
 });
@@ -82,11 +84,10 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
     expect(ios.every((p) => p.status === "environment_unavailable")).toBe(true);
   });
 
-  it("no_failure_case es NO_REPAIR_NEEDED y PROVISIONAL, no un caso a medias", () => {
+  it("no_failure_case es NO_REPAIR_NEEDED, no un caso a medias", () => {
     const bundle = bundleFor("acme/kmp-quiet@aaaaaaa..bbbbbbb")!;
     expect(bundle.stage_state).toBe("NO_REPAIR_NEEDED");
-    // El ADR 0015 §4 exige §3 antes de fijar esta salida, y §3 entra en el paso 4.
-    expect(isProvisionalExit(bundle)).toBe(true);
+    expect(bundle.execution!.failures).toEqual([]);
   });
 
   it("la matriz tiene las mismas filas en las dos revisiones: el plan sale de base", () => {
@@ -109,6 +110,27 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
 
 describe("los 94 del corpus", () => {
   const corpus = bundles.filter((b) => b.case_id !== null);
+
+  it("todos traen catalog_origin y licence, y ningún fixture los trae", () => {
+    // Es procedencia y CONTRASTE, no evidencia: por eso vive fuera de `execution`.
+    for (const bundle of corpus) {
+      expect(bundle.catalog_origin).not.toBeNull();
+      expect(bundle.catalog_origin!.case_id).toBe(bundle.case_id);
+      expect(bundle.licence!.spdx).not.toBe("");
+      // El texto de licencia servido por el sitio llega con el paso 11, no ahora.
+      expect(bundle.licence!.local_text_sha256).toBeNull();
+    }
+    for (const bundle of bundles.filter((b) => b.case_id === null)) {
+      expect(bundle.catalog_origin).toBeNull();
+    }
+  });
+
+  it("el catálogo NO trae texto de error, solo un booleano", () => {
+    // Por eso build_errors no puede existir sin correr un build: es el hueco que §2 cierra.
+    for (const bundle of corpus)
+      for (const probe of bundle.catalog_origin!.probes)
+        expect(typeof probe.has_parseable_error).toBe("boolean");
+  });
 
   it("son 94, en 19 repos, y ninguno pasa de INGESTED", () => {
     expect(corpus).toHaveLength(94);

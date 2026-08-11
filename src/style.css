@@ -281,3 +281,17 @@ td.probe-environment_unavailable,
 td.probe-not_reached {
   color: var(--muted);
 }
+
+/* Bloque de catálogo: contraste, no evidencia. Se distingue del resto sin gritar. */
+section.catalog {
+  border-left: 4px solid var(--rule);
+  padding-left: 1rem;
+  margin-top: 2rem;
+}
+
+section.catalog th {
+  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 0.85em;
+  width: 14rem;
+}

@@ -104,6 +104,34 @@ export interface Blocked {
   permanent: boolean;
 }
 
+export interface CatalogProbe {
+  target: string;
+  stage: string;
+  status: string;
+  has_parseable_error: boolean;
+  jdk_version: number;
+}
+
+export interface CatalogOrigin {
+  corpus_version: string;
+  case_id: number;
+  repository: string;
+  base_commit_date: string;
+  environment_fingerprint: Record<string, unknown>;
+  requirements: Record<string, unknown>;
+  dependency_change: { label: string; from: string; to: string; source: string };
+  probes: CatalogProbe[];
+  repair_signal: { broken_targets: string[]; broken_families: string[]; base_green_targets: string[] };
+}
+
+export interface CatalogLicence {
+  spdx: string;
+  resolved_at: string;
+  url: string;
+  local_text: string | null;
+  local_text_sha256: string | null;
+}
+
 export interface Bundle {
   schema_version: number;
   generated_at: string;
@@ -118,8 +146,8 @@ export interface Bundle {
   dynamic: unknown | null;
   structural: unknown | null;
   runs: unknown[];
-  catalog_origin: unknown | null;
-  licence: unknown | null;
+  catalog_origin: CatalogOrigin | null;
+  licence: CatalogLicence | null;
   warning: unknown | null;
 }
 

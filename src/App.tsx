@@ -1,4 +1,4 @@
-import { bundleFor, bundles, isProvisionalExit } from "./data";
+import { bundleFor, bundles } from "./data";
 import { useRoute } from "./routes";
 import { Case } from "./views/Case";
 import { Domain } from "./views/Domain";
@@ -49,7 +49,6 @@ function Index() {
                 </td>
                 <td>
                   <code>{bundle.stage_state}</code>
-                  {isProvisionalExit(bundle) && <div className="muted">provisional</div>}
                 </td>
                 <td>{bundle.update?.bumps.length ?? "—"}</td>
                 <td className="muted">

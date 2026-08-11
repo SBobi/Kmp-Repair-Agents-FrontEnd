@@ -91,13 +91,6 @@ export function bundleFor(caseKey: string): Bundle | undefined {
   return bundles.find((bundle) => bundle.case_key === caseKey);
 }
 
-/**
- * Una salida `NO_REPAIR_NEEDED` fijada sin evidencia dinámica es **provisional**.
- * El ADR 0015 §4 exige que §3 corra antes de fijarla, y §3 entra en el paso 4.
- */
-export function isProvisionalExit(bundle: Bundle): boolean {
-  return bundle.stage_state === "NO_REPAIR_NEEDED" && bundle.dynamic === null;
-}
 
 /** Índice de fila de cada estado dentro de su máquina. El orden declarado ES el del layout. */
 export function rowOf(machine: Machine, stateName: string): number {
