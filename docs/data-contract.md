@@ -170,12 +170,15 @@ ser igual de grande, o rechazado justamente por el límite de tamaño del aplica
 colapsa por parche, igual que en el Mining.
 
 **Que haya un solo intento, ni una sola corrida.** Cada caso corre en **cuatro modos**
-—`raw_error`, `context_rich`, `iterative_agentic`, `full_pipeline`— y cada modo da **hasta cinco
+—`raw_error`, `context_rich`, `iterative_agentic`, `full_pipeline`— y cada modo da **hasta tres
 vueltas** del lazo §6→§7→§8, con su patch, su validación y su prosa cada una
 ([ADR 0028](../../Kmp-Repair-Agents/docs/decisions/0028-four-modes-and-on-demand-exploration.md),
 [ADR 0029](../../Kmp-Repair-Agents/docs/decisions/0029-the-loop-and-what-travels-back.md)). La vista
 de intentos es una lista desde el primer día, y **la comparación entre modos es lo que hay que ver,
-no un accesorio**: sobre 94 casos son hasta 376 corridas y 1 128 intentos.
+no un accesorio**: sobre 94 casos son hasta **376 corridas (94 × 4) y 1 128 intentos (94 × 4 × 3)**.
+La aritmética va escrita a propósito: esta frase decía «hasta cinco vueltas» mientras cerraba con
+1 128, que solo sale con tres. Un tope que no cuadra con su propio total es lo que hay que poder
+ver sin abrir un ADR.
 
 Cuatro reglas que salen de ahí:
 
