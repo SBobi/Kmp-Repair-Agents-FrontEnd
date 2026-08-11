@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-11T13:38:16+00:00",
-  "pipeline_git_sha": "9154920c7a97231cd9600bff1f5e541195319240",
+  "generated_at": "2026-08-11T14:25:41+00:00",
+  "pipeline_git_sha": "c6f42d56a39953a2745b712c1d7be9c02a0a8d6d",
   "case_key": "acme/kmp-sample@0d8bee72..94fb90fc",
   "resolved_key": "acme/kmp-sample@0d8bee72..94fb90fc",
   "case_id": null,
@@ -105,7 +105,7 @@
         "message": "e: file:///w/jvm/src/jvmMain/kotlin/Store.kt:9:5 Unresolved reference: encodeToJsonElement",
         "entity": "encodeToJsonElement",
         "parser_id": "kotlin-unresolved-reference",
-        "causal_role": "cascade"
+        "causal_role": "primary"
       }
     ],
     "build_errors": "e: file:///w/shared/src/commonMain/kotlin/Model.kt:14:32 Unresolved reference: encodeToJsonElement\ne: file:///w/jvm/src/jvmMain/kotlin/Store.kt:9:5 Unresolved reference: encodeToJsonElement",

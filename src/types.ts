@@ -90,8 +90,10 @@ export interface Failure {
 
 export interface ExecutionSection {
   probes: Probe[];
-  failures: Failure[];
-  build_errors: string;
+  // `null` mientras §2 no cerró. `null` ≠ `[]` ≠ `""`: «no se llegó a parsear» no es «se parseó
+  // y no había», y esta sección se persiste a medida que salen los probes.
+  failures: Failure[] | null;
+  build_errors: string | null;
   configuration_evaluates: Record<string, boolean>;
   raw_log_ref: string | null;
   probe_diff: string[];

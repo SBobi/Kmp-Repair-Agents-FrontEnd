@@ -74,6 +74,18 @@ export function checkBundle(candidate: Bundle): Bundle {
   if (candidate.blocked !== null && candidate.stage_state !== "UNAVAILABLE") {
     throw new SchemaContractError("`blocked` poblado sin estado UNAVAILABLE");
   }
+  // Un parche generado NO se publica sin su aviso experimental. Hoy no hay ninguno, así que
+  // esto no dispara — y ése es el momento de ponerlo: después del primer parche sería una
+  // corrección, no un control. `GeneratedPatch.warning` habla del parche que produjo un modelo,
+  // no del corpus: son dos sujetos distintos y cruzarlos es el defecto A18/A30.
+  const hasPatch = (candidate.runs as { attempts?: { synthesis?: unknown }[] }[]).some((run) =>
+    (run.attempts ?? []).some((attempt) => attempt.synthesis != null),
+  );
+  if (hasPatch && candidate.warning == null) {
+    throw new SchemaContractError(
+      "hay un parche generado y `warning` está vacío: no se publica un parche sin su aviso",
+    );
+  }
   return candidate;
 }
 
