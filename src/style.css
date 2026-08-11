@@ -235,3 +235,49 @@ th {
   outline: 2px solid var(--fg);
   outline-offset: 2px;
 }
+
+/* Ficha de caso */
+
+section h2 {
+  font-size: 1.05rem;
+}
+
+h4 {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.unreached {
+  color: var(--muted);
+  border-left: 3px solid var(--rule);
+  padding-left: 0.75rem;
+}
+
+.provisional {
+  border-left: 4px solid var(--exit);
+  background: #fdf6ee;
+  padding: 0.6rem 0.9rem;
+}
+
+/* Glifo + etiqueta: el estado nunca va solo por color. */
+td.probe {
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+td.probe .sr-label {
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.8rem;
+}
+
+td.probe-green {
+  color: var(--terminal);
+}
+td.probe-red {
+  color: #c92a2a;
+}
+td.probe-environment_unavailable,
+td.probe-not_reached {
+  color: var(--muted);
+}

@@ -54,6 +54,75 @@ export interface BlockedReasonDoc {
   why: string;
 }
 
+// ---- El dump del CASO (`kmp-repair dump`), que es otro artefacto ----
+
+export interface Bump {
+  label: string;
+  from: string;
+  to: string;
+  file: string;
+  update_kind: string;
+}
+
+export interface UpdateSection {
+  bumps: Bump[];
+  base_sha: string;
+  head_sha: string;
+  primary_bump: string | null;
+}
+
+export type ProbeStatus = "green" | "red" | "environment_unavailable" | "not_reached";
+
+export interface Probe {
+  target: string;
+  level: string;
+  revision: string;
+  status: ProbeStatus;
+  raw_log_ref: string | null;
+}
+
+export interface Failure {
+  message: string;
+  entity: string | null;
+  parser_id: string;
+  causal_role: string;
+}
+
+export interface ExecutionSection {
+  probes: Probe[];
+  failures: Failure[];
+  build_errors: string;
+  configuration_evaluates: Record<string, boolean>;
+  raw_log_ref: string | null;
+  probe_diff: string[];
+}
+
+export interface Blocked {
+  stage: string;
+  reason: string;
+  message: string;
+  permanent: boolean;
+}
+
+export interface Bundle {
+  schema_version: number;
+  generated_at: string;
+  pipeline_git_sha: string;
+  case_key: string;
+  resolved_key: string;
+  case_id: number | null;
+  stage_state: string;
+  blocked: Blocked | null;
+  update: UpdateSection | null;
+  execution: ExecutionSection | null;
+  dynamic: unknown | null;
+  structural: unknown | null;
+  runs: unknown[];
+  catalog_origin: unknown | null;
+  licence: unknown | null;
+  warning: unknown | null;
+}
+
 export interface Schema {
   schema_version: number;
   pipeline_git_sha: string;

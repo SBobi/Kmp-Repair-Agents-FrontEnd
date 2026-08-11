@@ -1,6 +1,6 @@
 # Especificación funcional — visor de Case Bundles
 
-**Estado: los pasos 0 y 1 implementados; del 2 en adelante, backlog.** Este documento sigue el
+**Estado: los pasos 0, 1 y 2 implementados; del 3 en adelante, backlog.** Este documento sigue el
 [roadmap del pipeline](../../Kmp-Repair-Agents/docs/roadmap.md): cada paso de allá tiene aquí su
 vista, y el paso no se considera hecho hasta que esa vista existe y se mira
 ([ADR 0008](../../Kmp-Repair-Agents/docs/decisions/0008-every-step-verified-by-ui.md)).
@@ -71,7 +71,7 @@ de grafos «si una flecha tuviera que ir hacia atrás entre columnas», y
 sin cruzar nada, y no justifica arrastrar un motor de layout que además no sabe que hay niveles.
 Se reconsidera si aparece la segunda.
 
-### Paso 2 — slice vertical con fakes: primera ficha de caso
+### Paso 2 — slice vertical con fakes: primera ficha de caso · **implementado** (`/#/case/…`)
 
 Pipeline: etapas Update + Execution sobre `worked_case` y `no_failure_case`, con `ScriptedRunner`.
 Primer `kmp-repair dump` real.
@@ -102,6 +102,17 @@ ni omitidas en silencio. Dentro:
 *Probado:* `no_failure_case` debe llegar a `NO_REPAIR_NEEDED` y verse como tal, con las cuatro
 secciones siguientes "no alcanzadas". Si la ficha lo pinta como un caso normal a medio hacer, el
 atajo está mal implementado.
+
+*Cómo quedó.* Las ocho secciones se listan siempre y las seis que ninguna etapa produce todavía se
+dibujan **"no alcanzada" con la razón derivada del estado**, no con un texto fijo: un
+`NO_REPAIR_NEEDED` dice «el caso salió en §2», un `EXECUTED` dice «§4 es perezosa y el caso no
+llegó», un `UNAVAILABLE` dice en qué etapa se cayó. La rejilla es target × revisión **con columna
+de nivel**, y la columna `updated` sabe colapsar a «no alcanzado» cuando la configuración no
+evalúa. Cada celda lleva **glifo y etiqueta en texto**, no solo color.
+
+Y `NO_REPAIR_NEEDED` sale marcado **PROVISIONAL** con su razón a la vista, derivada de que
+`dynamic` siga en `null` — el ADR 0015 §4 exige que §3 corra antes de fijar esa salida. No hace
+falta un campo nuevo para saberlo: la ausencia de la sección **es** el dato.
 
 ### Paso 3 — adapters reales: la misma ficha, otro origen
 

@@ -11,10 +11,11 @@ Importa un JSON y lo dibuja — mismo contrato que
 
 ## Estado
 
-**Una vista, la del paso 1.** La app levanta, compila y dibuja `/#/domain`: las tres máquinas de
-estados, las aristas entre niveles y la taxonomía, **todo desde el dump**. No hay ninguna ficha de
-caso todavía, porque el pipeline no produce ningún bundle. La app se construye en paralelo al
-pipeline, una vista por paso: ver [docs/spec.md](docs/spec.md) y el
+**Dos vistas: `/#/domain` y la ficha de caso.** El dominio —las tres máquinas, las aristas entre
+niveles y la taxonomía— y los dos casos de fixture que produce `kmp-repair demo`, con sus ocho
+secciones y la rejilla target × revisión. Todo desde el dump, ninguna cifra escrita a mano. Los 94
+casos son del paso 11. La app se construye en paralelo al pipeline, una vista por paso: ver
+[docs/spec.md](docs/spec.md) y el
 [roadmap del pipeline](../Kmp-Repair-Agents/docs/roadmap.md).
 
 ## Por qué existe desde el paso 1 y no al final
@@ -35,13 +36,16 @@ Un comando del pipeline emite el artefacto; esta app lo importa. Son **dos archi
 
 ```bash
 cd ../Kmp-Repair-Agents
-kmp-repair schema-dump > ../Kmp-Repair-Agents-FrontEnd/data/schema.json   # el dominio
-kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json  # un caso
+F=../Kmp-Repair-Agents-FrontEnd/data
+kmp-repair schema-dump                     > $F/schema.json
+kmp-repair demo --fixture worked_case      > $F/bundle.worked_case.json
+kmp-repair demo --fixture no_failure_case  > $F/bundle.no_failure_case.json
 ```
 
-`schema.json` **se versiona** —es función de las constantes del dominio, no de una corrida, y sin
-él `npm run build` no pasa el type-check en un clone limpio—. `bundle.json` no: sale de una corrida
-y se regenera.
+**Los dos se versionan mientras los casos sean fixtures**: sin ellos `npm run build` no pasa el
+type-check en un clone limpio, y un dump estático es el mejor fixture posible. Cuando el índice
+salga del corpus (paso 11) esa regla cambia, y se escribe en
+[docs/data-contract.md](docs/data-contract.md).
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
 [docs/data-contract.md](docs/data-contract.md). Qué lo produce y por qué contiene eso, en el repo

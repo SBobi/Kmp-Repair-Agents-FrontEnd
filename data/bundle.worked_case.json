@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-11T13:38:16+00:00",
+  "pipeline_git_sha": "9154920c7a97231cd9600bff1f5e541195319240",
+  "case_key": "acme/kmp-sample@0d8bee72..94fb90fc",
+  "resolved_key": "acme/kmp-sample@0d8bee72..94fb90fc",
+  "case_id": null,
+  "stage_state": "EXECUTED",
+  "blocked": null,
+  "update": {
+    "bumps": [
+      {
+        "label": "kotlinxSerialization",
+        "from": "1.6.0",
+        "to": "1.7.3",
+        "file": "gradle/libs.versions.toml",
+        "update_kind": "plugin-toolchain"
+      }
+    ],
+    "base_sha": "0d8bee72",
+    "head_sha": "94fb90fc",
+    "primary_bump": null
+  },
+  "execution": {
+    "probes": [
+      {
+        "target": "shared",
+        "level": "compile",
+        "revision": "base",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "jvm",
+        "level": "compile",
+        "revision": "base",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "jvm-test",
+        "level": "compile-test",
+        "revision": "base",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "android",
+        "level": "compile",
+        "revision": "base",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "ios",
+        "level": "link",
+        "revision": "base",
+        "status": "environment_unavailable",
+        "raw_log_ref": null
+      },
+      {
+        "target": "shared",
+        "level": "compile",
+        "revision": "updated",
+        "status": "red",
+        "raw_log_ref": null
+      },
+      {
+        "target": "jvm",
+        "level": "compile",
+        "revision": "updated",
+        "status": "red",
+        "raw_log_ref": null
+      },
+      {
+        "target": "jvm-test",
+        "level": "compile-test",
+        "revision": "updated",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "android",
+        "level": "compile",
+        "revision": "updated",
+        "status": "green",
+        "raw_log_ref": null
+      },
+      {
+        "target": "ios",
+        "level": "link",
+        "revision": "updated",
+        "status": "environment_unavailable",
+        "raw_log_ref": null
+      }
+    ],
+    "failures": [
+      {
+        "message": "e: file:///w/shared/src/commonMain/kotlin/Model.kt:14:32 Unresolved reference: encodeToJsonElement",
+        "entity": "encodeToJsonElement",
+        "parser_id": "kotlin-unresolved-reference",
+        "causal_role": "primary"
+      },
+      {
+        "message": "e: file:///w/jvm/src/jvmMain/kotlin/Store.kt:9:5 Unresolved reference: encodeToJsonElement",
+        "entity": "encodeToJsonElement",
+        "parser_id": "kotlin-unresolved-reference",
+        "causal_role": "cascade"
+      }
+    ],
+    "build_errors": "e: file:///w/shared/src/commonMain/kotlin/Model.kt:14:32 Unresolved reference: encodeToJsonElement\ne: file:///w/jvm/src/jvmMain/kotlin/Store.kt:9:5 Unresolved reference: encodeToJsonElement",
+    "configuration_evaluates": {
+      "base": true,
+      "updated": true
+    },
+    "raw_log_ref": "015e94dcaccbcb9e6c7383cd0832114716a6abb1fa77cf95764126aaa12eea6d",
+    "probe_diff": []
+  },
+  "dynamic": null,
+  "structural": null,
+  "runs": [],
+  "catalog_origin": null,
+  "licence": null,
+  "warning": null
+}

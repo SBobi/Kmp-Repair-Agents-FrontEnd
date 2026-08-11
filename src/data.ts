@@ -5,11 +5,26 @@
 // paso del roadmap, así que acá se falla ruidosamente con uno que esta app no reconoce en vez
 // de renderizar secciones a medias.
 
+import noFailureJson from "../data/bundle.no_failure_case.json";
+import workedJson from "../data/bundle.worked_case.json";
 import schemaJson from "../data/schema.json";
-import type { Machine, Schema, State, Transition } from "./types";
+import type { Bundle, Machine, Schema, State, Transition } from "./types";
 
 /** La versión que esta app entiende. Subirla es portar las vistas, no tocar este número. */
 export const SUPPORTED_SCHEMA_VERSION = 1;
+export const SUPPORTED_BUNDLE_VERSION = 1;
+
+/** Las ocho secciones del Case Bundle, en el orden de las etapas. Ninguna más. */
+export const SECTIONS = [
+  "update",
+  "execution",
+  "dynamic",
+  "structural",
+  "localization",
+  "synthesis",
+  "validation",
+  "explanation",
+] as const;
 
 export class SchemaContractError extends Error {}
 
@@ -35,6 +50,46 @@ export function checkSchema(candidate: Schema): Schema {
 }
 
 export const schema: Schema = checkSchema(schemaJson as Schema);
+
+export function checkBundle(candidate: Bundle): Bundle {
+  if (candidate.schema_version !== SUPPORTED_BUNDLE_VERSION) {
+    throw new SchemaContractError(
+      `bundle schema_version ${candidate.schema_version}: esta app entiende la ${SUPPORTED_BUNDLE_VERSION}`,
+    );
+  }
+  if (!candidate.pipeline_git_sha) {
+    throw new SchemaContractError("bundle sin pipeline_git_sha: no es trazable a una versión");
+  }
+  // `runs` es una LISTA aunque traiga un solo elemento. Es la forma que más va a aparecer al
+  // principio y la que se colapsa a objeto sin querer.
+  if (!Array.isArray(candidate.runs)) {
+    throw new SchemaContractError("`runs` tiene que ser una lista, también cuando trae una sola");
+  }
+  // Toda sección ausente tiene que estar justificada por el estado. `MODELED` es terminal de
+  // CaseState, así que un caso EXECUTED sin `structural` es correcto; uno MODELED sin él, no.
+  if (candidate.stage_state === "MODELED" && candidate.structural === null) {
+    throw new SchemaContractError("MODELED sin `structural`: hay un hueco sin explicación");
+  }
+  if (candidate.blocked !== null && candidate.stage_state !== "UNAVAILABLE") {
+    throw new SchemaContractError("`blocked` poblado sin estado UNAVAILABLE");
+  }
+  return candidate;
+}
+
+/** Un archivo por caso hasta el paso 11, cuando el índice sale del corpus. */
+export const bundles: Bundle[] = [workedJson as Bundle, noFailureJson as Bundle].map(checkBundle);
+
+export function bundleFor(caseKey: string): Bundle | undefined {
+  return bundles.find((bundle) => bundle.case_key === caseKey);
+}
+
+/**
+ * Una salida `NO_REPAIR_NEEDED` fijada sin evidencia dinámica es **provisional**.
+ * El ADR 0015 §4 exige que §3 corra antes de fijarla, y §3 entra en el paso 4.
+ */
+export function isProvisionalExit(bundle: Bundle): boolean {
+  return bundle.stage_state === "NO_REPAIR_NEEDED" && bundle.dynamic === null;
+}
 
 /** Índice de fila de cada estado dentro de su máquina. El orden declarado ES el del layout. */
 export function rowOf(machine: Machine, stateName: string): number {
