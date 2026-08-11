@@ -12,9 +12,9 @@ Importa un JSON y lo dibuja — mismo contrato que
 ## Estado
 
 **Dos vistas: `/#/domain` y la ficha de caso.** El dominio —las tres máquinas, las aristas entre
-niveles y la taxonomía— y los dos casos de fixture que produce `kmp-repair demo`, con sus ocho
-secciones y la rejilla target × revisión. Todo desde el dump, ninguna cifra escrita a mano. Los 94
-casos son del paso 11. La app se construye en paralelo al pipeline, una vista por paso: ver
+niveles y la taxonomía— y **96 casos**: los 94 del corpus con §1, más dos fixtures con §1 y §2.
+Todo desde el dump, ninguna cifra escrita a mano. Los 94 llegan con `stage_state: INGESTED` y sus
+otras siete secciones marcadas «no alcanzada» — §2 necesita Gradle real, que es el paso 3. La app se construye en paralelo al pipeline, una vista por paso: ver
 [docs/spec.md](docs/spec.md) y el
 [roadmap del pipeline](../Kmp-Repair-Agents/docs/roadmap.md).
 
@@ -32,7 +32,7 @@ contrato del dump**, nunca lo rompe hacia atrás.
 
 ## De dónde salen los datos
 
-Un comando del pipeline emite el artefacto; esta app lo importa. Son **dos archivos, no uno**:
+Un comando del pipeline emite el artefacto; esta app lo importa. Son **cuatro archivos**:
 
 ```bash
 cd ../Kmp-Repair-Agents
@@ -40,12 +40,13 @@ F=../Kmp-Repair-Agents-FrontEnd/data
 kmp-repair schema-dump                     > $F/schema.json
 kmp-repair demo --fixture worked_case      > $F/bundle.worked_case.json
 kmp-repair demo --fixture no_failure_case  > $F/bundle.no_failure_case.json
+kmp-repair ingest                          > $F/corpus.json   # §1 sobre los 94, sin red
 ```
 
-**Los dos se versionan mientras los casos sean fixtures**: sin ellos `npm run build` no pasa el
-type-check en un clone limpio, y un dump estático es el mejor fixture posible. Cuando el índice
-salga del corpus (paso 11) esa regla cambia, y se escribe en
-[docs/data-contract.md](docs/data-contract.md).
+**Los cuatro se versionan**: sin ellos `npm run build` no pasa el type-check en un clone limpio, y
+un dump estático es el mejor fixture posible. `corpus.json` se regenera con un comando y **no
+depende de red** —`dependency_diff` es una columna del catálogo—, pero sí de que
+`data/corpus/model_input_v1.db` esté copiado a mano en el repo del pipeline (ADR 0001).
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
 [docs/data-contract.md](docs/data-contract.md). Qué lo produce y por qué contiene eso, en el repo

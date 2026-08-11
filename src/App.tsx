@@ -4,12 +4,29 @@ import { Case } from "./views/Case";
 import { Domain } from "./views/Domain";
 
 function Index() {
+  const corpus = bundles.filter((b) => b.case_id !== null);
+  const repos = new Set(corpus.map((b) => b.case_key.split("@")[0]));
+  const withExecution = bundles.filter((b) => b.execution !== null).length;
+  const kinds = new Map<string, number>();
+  for (const bundle of bundles)
+    for (const bump of bundle.update?.bumps ?? [])
+      kinds.set(bump.update_kind, (kinds.get(bump.update_kind) ?? 0) + 1);
+
   return (
     <main>
       <h1>Case Bundle Explorer</h1>
       <p className="state">
-        Paso 2 — {bundles.length} casos, los dos de fixture. El índice de los 94 es del paso 11.
-        Al lado, el dominio: <a href="#/domain">las tres máquinas de estados y la taxonomía</a>.
+        {corpus.length} casos del corpus en {repos.size} repos, más {bundles.length - corpus.length}{" "}
+        fixtures. <strong>{withExecution} tienen §2</strong>: sobre el corpus solo corrió §1, porque
+        §2 necesita Gradle real (paso 3). Al lado, el dominio:{" "}
+        <a href="#/domain">las tres máquinas de estados y la taxonomía</a>.
+      </p>
+      <p className="legend">
+        {[...kinds].map(([kind, n]) => (
+          <span key={kind} className="chip">
+            <code>{kind}</code> {n}
+          </span>
+        ))}
       </p>
       <div className="scroll">
         <table>
@@ -18,6 +35,7 @@ function Index() {
               <th>caso</th>
               <th>estado</th>
               <th>bumps</th>
+              <th>clases</th>
               <th>origen</th>
             </tr>
           </thead>
@@ -25,7 +43,7 @@ function Index() {
             {bundles.map((bundle) => (
               <tr key={bundle.case_key}>
                 <td>
-                  <a href={`#/case/${bundle.case_key}`}>
+                  <a href={`#/case/${encodeURIComponent(bundle.case_key)}`}>
                     <code>{bundle.case_key}</code>
                   </a>
                 </td>
@@ -34,6 +52,9 @@ function Index() {
                   {isProvisionalExit(bundle) && <div className="muted">provisional</div>}
                 </td>
                 <td>{bundle.update?.bumps.length ?? "—"}</td>
+                <td className="muted">
+                  {[...new Set((bundle.update?.bumps ?? []).map((b) => b.update_kind))].join(" · ")}
+                </td>
                 <td className="muted">
                   {bundle.case_id === null ? "ad-hoc" : `catálogo #${bundle.case_id}`}
                 </td>

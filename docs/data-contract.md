@@ -27,17 +27,23 @@ caso. El otro es `schema-dump`:
 | archivo | qué trae | de qué es función | ¿se versiona? |
 |---|---|---|---|
 | `data/schema.json` | las tres máquinas, sus transiciones **entre niveles**, la taxonomía y los motivos de `UNAVAILABLE` | las constantes del dominio y el sha del pipeline | **sí** — sin él `npm run build` no pasa el type-check en un clone limpio |
-| `data/bundle.<fixture>.json` | un caso | una corrida | **sí, mientras sean fixtures** |
+| `data/bundle.<fixture>.json` | un caso, con §1 y §2 | una corrida sobre fixture | **sí, mientras sean fixtures** |
+| `data/corpus.json` | **los 94, con §1 sola** | `kmp-repair ingest` sobre el catálogo | sí — se regenera con un comando y no depende de red |
 
 `schema.json` **no lleva `generated_at` a propósito**: no depende de cuándo se corrió, así que un
 timestamp solo produciría un diff en cada regeneración sobre un contenido idéntico. La procedencia
 es `pipeline_git_sha`, igual que acá. Los dos pasan por el mismo control de frontera en
 `src/data.ts` y los dos fallan ruidosamente con un `schema_version` que la app no entiende.
 
-**Y son N archivos de bundle, uno por caso, no uno.** Hasta el paso 11 los casos son fixtures y se
-versionan: sin ellos `npm run build` no pasa el type-check en un clone limpio, y son el mejor
-fixture posible porque son estáticos. El índice del paso 11 sale del corpus y entonces esta regla
-cambia — cuando cambie, se escribe acá.
+**Y los bundles llegan en dos formas, con dos grados de completitud, a propósito.** Los fixtures
+traen §1 y §2; los 94 del corpus traen **§1 sola**, porque §2 necesita Gradle real. La app los
+concatena y el índice los muestra juntos: **el bundle se autodescribe** —`case_id` en `null` es
+ad-hoc, `stage_state: INGESTED` explica las siete secciones ausentes—, así que no hace falta una
+marca de procedencia además.
+
+Y eso obliga a algo que la app ya tenía que hacer y ahora está probado: **una ficha sin `execution`
+no puede pintarse como un caso a medio hacer.** Su estado dice por qué falta. Si la vista dibujara
+las secciones vacías sin la razón, un caso no ejecutado y uno roto se verían igual.
 
 ## Regla de crecimiento
 

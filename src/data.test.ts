@@ -90,7 +90,12 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
   });
 
   it("la matriz tiene las mismas filas en las dos revisiones: el plan sale de base", () => {
-    for (const bundle of bundles) {
+    // Solo los que tienen §2. Los 94 del corpus no la tienen y eso es correcto: sobre ellos
+    // corrió §1 sola. Este test daba por hecho que todos la traían, y lo pilló al llegar el
+    // corpus — que es exactamente para lo que sirve mirar datos reales en vez de dos fixtures.
+    const withExecution = bundles.filter((b) => b.execution !== null);
+    expect(withExecution.length).toBeGreaterThan(0);
+    for (const bundle of withExecution) {
       const rows = (revision: string) =>
         new Set(
           bundle
@@ -98,6 +103,34 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
             .map((p) => `${p.target} ${p.level}`),
         );
       expect([...rows("updated")].sort()).toEqual([...rows("base")].sort());
+    }
+  });
+});
+
+describe("los 94 del corpus", () => {
+  const corpus = bundles.filter((b) => b.case_id !== null);
+
+  it("son 94, en 19 repos, y ninguno pasa de INGESTED", () => {
+    expect(corpus).toHaveLength(94);
+    expect(new Set(corpus.map((b) => b.case_key.split("@")[0])).size).toBe(19);
+    expect(new Set(corpus.map((b) => b.stage_state))).toEqual(new Set(["INGESTED"]));
+  });
+
+  it("ninguna lista de bumps sale vacía, y ninguno usa la forma #pr", () => {
+    // `model_input` no tiene columna `pr_number`: los 94 llevan siempre @base..head.
+    for (const bundle of corpus) {
+      expect(bundle.update!.bumps.length).toBeGreaterThan(0);
+      expect(bundle.case_key).not.toContain("#");
+    }
+  });
+
+  it("una ficha sin §2 no puede pintarse como un caso a medio hacer", () => {
+    // Su estado es INGESTED y eso EXPLICA las siete secciones ausentes. Si la vista las
+    // dibujara vacías sin decir por qué, un caso no ejecutado y uno roto se verían igual.
+    for (const bundle of corpus) {
+      expect(bundle.execution).toBeNull();
+      expect(bundle.blocked).toBeNull();
+      expect(bundle.runs).toEqual([]);
     }
   });
 });

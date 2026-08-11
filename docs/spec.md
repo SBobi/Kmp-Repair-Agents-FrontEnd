@@ -84,6 +84,13 @@ ni omitidas en silencio. Dentro:
   `update_kind`—, los dos SHAs y el diff del bot. Es una lista aunque traiga un solo elemento, y
   10 de los 94 casos traen entre 2 y 4: la vista los muestra todos, nunca solo el primero. Cuando
   una fase posterior marcó el **bump primario**, se destaca; mientras siga `null` no se inventa uno.
+
+  > **Ojo con esa cifra al mirar la pantalla: en el visor van a ser 13, no 10, y las dos son
+  > correctas.** El 10 es el `bump_count` del corpus, que cuenta **versiones**; el 13 es lo que
+  > `classify_update` deriva, que cuenta **entradas** e incluye los punteros de submódulo, sin
+  > versión que contar. Los tres de diferencia son casos de `reference-update`. Es la misma
+  > distinción que hizo falta para corregir la lista vacía en
+  > [data-contract.md](data-contract.md), y por eso conviene tenerla escrita donde se mira.
 - *Execution*: la **rejilla target × stage** (base / updated), heredada del front del Mining con su
   misma semántica de glifos, **más una columna de nivel** — `compile`, `compile-test`, `link`,
   `test-run`. Sin ella, los 7 casos que solo rompen al compilar tests quedan escondidos como «un
@@ -102,6 +109,13 @@ ni omitidas en silencio. Dentro:
 *Probado:* `no_failure_case` debe llegar a `NO_REPAIR_NEEDED` y verse como tal, con las cuatro
 secciones siguientes "no alcanzadas". Si la ficha lo pinta como un caso normal a medio hacer, el
 atajo está mal implementado.
+
+*Y desde el 2026-08-11 la ficha se mira contra los 94, no contra dos fixtures.* §1 corre sobre el
+catálogo entero sin red ni builds, así que el índice trae 96 casos y la ficha se ejercita contra
+formas reales: los 13 multi-bump, los 5 con `reference-update`, el que mezcla una versión con dos
+punteros de submódulo. Es la lección de la campaña de minado aplicada tres pasos antes — y ya
+cobró: un check de frontera daba por hecho que todo bundle trae `execution`, y se rompió al llegar
+el corpus.
 
 *Cómo quedó.* Las ocho secciones se listan siempre y las seis que ninguna etapa produce todavía se
 dibujan **"no alcanzada" con la razón derivada del estado**, no con un texto fijo: un

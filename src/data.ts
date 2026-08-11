@@ -7,6 +7,7 @@
 
 import noFailureJson from "../data/bundle.no_failure_case.json";
 import workedJson from "../data/bundle.worked_case.json";
+import corpusJson from "../data/corpus.json";
 import schemaJson from "../data/schema.json";
 import type { Bundle, Machine, Schema, State, Transition } from "./types";
 
@@ -76,8 +77,15 @@ export function checkBundle(candidate: Bundle): Bundle {
   return candidate;
 }
 
-/** Un archivo por caso hasta el paso 11, cuando el índice sale del corpus. */
-export const bundles: Bundle[] = [workedJson as Bundle, noFailureJson as Bundle].map(checkBundle);
+/**
+ * Los dos fixtures (§1 + §2) y los 94 del corpus (§1 sola: §2 necesita Gradle real).
+ * Que convivan no confunde porque el bundle se autodescribe: `case_id` null es ad-hoc.
+ */
+export const bundles: Bundle[] = [
+  workedJson as Bundle,
+  noFailureJson as Bundle,
+  ...(corpusJson as Bundle[]),
+].map(checkBundle);
 
 export function bundleFor(caseKey: string): Bundle | undefined {
   return bundles.find((bundle) => bundle.case_key === caseKey);
