@@ -75,6 +75,30 @@ describe("la frontera del bundle", () => {
   });
 });
 
+describe("la guarda del aviso experimental — probada rompiéndola", () => {
+  // Hoy NO puede dispararse: ningún bundle trae `synthesis`. Por eso hace falta perturbarla —
+  // una guarda que no se prueba es decoración, y ésta no avisaría de un error de tipeo en el
+  // camino de acceso hasta el paso 7, que es cuando ya no serviría.
+  const withPatch = (warning: unknown) =>
+    ({
+      ...bundles[0],
+      warning,
+      runs: [{ attempts: [{ synthesis: { diff: "--- a\n+++ b" } }] }],
+    }) as unknown as Bundle;
+
+  it("rechaza un parche generado sin su aviso", () => {
+    expect(() => checkBundle(withPatch(null))).toThrow(SchemaContractError);
+  });
+
+  it("y lo acepta con él — si rechazara los dos, no comprobaría nada", () => {
+    expect(() => checkBundle(withPatch({ experimental_only: true }))).not.toThrow();
+  });
+
+  it("hoy ningún bundle trae synthesis, así que la guarda no dispara sola", () => {
+    for (const bundle of bundles) expect(bundle.warning).toBeNull();
+  });
+});
+
 describe("los dos fixtures dicen cosas distintas a propósito", () => {
   it("worked_case llega a EXECUTED con el texto de error real y un ⊘ que no es fallo", () => {
     const bundle = bundleFor("acme/kmp-sample@0d8bee72..94fb90fc")!;
@@ -136,6 +160,14 @@ describe("los 94 del corpus", () => {
     expect(corpus).toHaveLength(94);
     expect(new Set(corpus.map((b) => b.case_key.split("@")[0])).size).toBe(19);
     expect(new Set(corpus.map((b) => b.stage_state))).toEqual(new Set(["INGESTED"]));
+  });
+
+  it("el contraste con el catálogo se persiste, coincida o no", () => {
+    // Tres estados: `null` es «no se comparó», y los fixtures ad-hoc son los únicos así.
+    for (const bundle of corpus) expect(bundle.update!.catalog_contrast).not.toBeNull();
+    expect(corpus.filter((b) => b.update!.catalog_contrast!.agrees === false)).toHaveLength(4);
+    for (const bundle of bundles.filter((b) => b.case_id === null))
+      expect(bundle.update!.catalog_contrast).toBeNull();
   });
 
   it("ninguna lista de bumps sale vacía, y ninguno usa la forma #pr", () => {

@@ -64,11 +64,18 @@ export interface Bump {
   update_kind: string;
 }
 
+export interface CatalogContrast {
+  agrees: boolean;
+  detail: string | null;
+}
+
 export interface UpdateSection {
   bumps: Bump[];
   base_sha: string;
   head_sha: string;
   primary_bump: string | null;
+  // `null` = no se comparó, porque el caso no vino de un catálogo. No es «coinciden».
+  catalog_contrast: CatalogContrast | null;
 }
 
 export type ProbeStatus = "green" | "red" | "environment_unavailable" | "not_reached";
@@ -96,7 +103,8 @@ export interface ExecutionSection {
   build_errors: string | null;
   configuration_evaluates: Record<string, boolean>;
   raw_log_ref: string | null;
-  probe_diff: string[];
+  // `null` = no se comparó. No es «se comparó y no hay discrepancia».
+  probe_diff: string[] | null;
 }
 
 export interface Blocked {

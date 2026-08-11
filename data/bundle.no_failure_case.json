@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-11T14:25:41+00:00",
-  "pipeline_git_sha": "c6f42d56a39953a2745b712c1d7be9c02a0a8d6d",
+  "generated_at": "2026-08-11T14:31:41+00:00",
+  "pipeline_git_sha": "2e8400f3773eb91b6a0aa92e0c3cdf30196cab6a",
   "case_key": "acme/kmp-quiet@aaaaaaa..bbbbbbb",
   "resolved_key": "acme/kmp-quiet@aaaaaaa..bbbbbbb",
   "case_id": null,
@@ -19,7 +19,8 @@
     ],
     "base_sha": "aaaaaaa",
     "head_sha": "bbbbbbb",
-    "primary_bump": null
+    "primary_bump": null,
+    "catalog_contrast": null
   },
   "execution": {
     "probes": [
@@ -59,7 +60,7 @@
       "updated": true
     },
     "raw_log_ref": null,
-    "probe_diff": []
+    "probe_diff": null
   },
   "dynamic": null,
   "structural": null,
