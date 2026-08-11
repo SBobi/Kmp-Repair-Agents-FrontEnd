@@ -86,6 +86,10 @@ export interface Probe {
   revision: string;
   status: ProbeStatus;
   raw_log_ref: string | null;
+  /** El log crudo de la revisión BASE. Es el que decide qué observación es `preexisting` en vez de
+   *  `primary`, y hasta el paso 3c-3 se descartaba: el rol quedaba en la ficha sin nada contra qué
+   *  auditarlo. `raw_log_ref` es el de `updated`, el que leen §5 y §6. */
+  base_log_ref: string | null;
 }
 
 export interface Failure {
@@ -103,6 +107,10 @@ export interface ExecutionSection {
   build_errors: string | null;
   configuration_evaluates: Record<string, boolean>;
   raw_log_ref: string | null;
+  /** El log crudo de la revisión BASE. Es el que decide qué observación es `preexisting` en vez de
+   *  `primary`, y hasta el paso 3c-3 se descartaba: el rol quedaba en la ficha sin nada contra qué
+   *  auditarlo. `raw_log_ref` es el de `updated`, el que leen §5 y §6. */
+  base_log_ref: string | null;
   // `null` = no se comparó. No es «se comparó y no hay discrepancia».
   probe_diff: string[] | null;
 }
@@ -124,6 +132,10 @@ export interface CatalogProbe {
 
 export interface CatalogOrigin {
   corpus_version: string;
+  /** El SHA-256 del archivo que el pipeline abrió. La Solicitud §I lo exige como precondición de
+   *  la Fase 2: `corpus_version` es la etiqueta que se pidió, el hash dice cuál se leyó — y este
+   *  corpus se regeneró cinco veces sin cambiar de nombre. */
+  corpus_sha256: string;
   case_id: number;
   repository: string;
   base_commit_date: string;

@@ -28,9 +28,14 @@ falta. Este documento describe el caso:
 | archivo | qué trae | de qué es función | ¿se versiona? |
 |---|---|---|---|
 | `data/schema.json` | las tres máquinas, sus transiciones **entre niveles**, la taxonomía y los motivos de `UNAVAILABLE` | las constantes del dominio y el sha del pipeline | **sí** — sin él `npm run build` no pasa el type-check en un clone limpio |
-| `data/bundle.<fixture>.json` | un caso, con §1 y §2 | una corrida sobre fixture | **sí, mientras sean fixtures** |
-| `data/corpus.json` | **los 94, con §1 sola** | `kmp-repair ingest` sobre el catálogo | sí — se regenera con un comando y no depende de red |
-| `data/executed.json` | **una muestra con §1 y §2 de verdad** | `scripts/probe_execution_against_catalog.py --dump` | sí — pero **no se regenera con un comando**: son horas de Gradle real |
+| `data/executed.json` | **los cinco casos con §1 y §2 de verdad** | `scripts/probe_execution_against_catalog.py --dump` | sí, y con más razón que ninguno — **no se regenera con un comando barato**: pide mirrors, JDK, red y horas de Gradle |
+
+**Y es el único archivo de casos que queda.** Vivieron acá dos fixtures con `ScriptedRunner`, un
+caso ad-hoc salido de git y los 94 del corpus con §1 sola; se quitaron a propósito, porque lo que
+se mira ahora es **evidencia medida** y no la forma del contrato ilustrada con datos inventados.
+Los cuatro se regeneran con una línea cada uno (README). Lo que se pierde —§1 sobre los 94 y la
+comparación ad-hoc contra catálogo del paso 3b— **sigue comprobado en el pipeline**; lo que ya no
+se puede es mirarlo acá.
 
 `schema.json` **no lleva `generated_at` a propósito**: no depende de cuándo se corrió, así que un
 timestamp solo produciría un diff en cada regeneración sobre un contenido idéntico. La procedencia
@@ -66,15 +71,14 @@ que rechace sin aviso, que acepte con él, y que hoy no dispare sola. Una guarda
 disparar y que nadie perturba no avisaría de un error de tipeo en el camino de acceso hasta el paso
 7 — cuando ya no serviría.
 
-**Y los bundles llegan en tres formas, con tres grados de completitud, a propósito.** Los fixtures
-traen §1 y §2 con `ScriptedRunner`; los 94 del corpus traen **§1 sola**, porque §2 necesita Gradle
-real; y `executed.json` trae **una muestra de casos reales con §2 medida**, con probes de verdad en
-los cuatro niveles. La app los concatena y el índice los muestra juntos: **el bundle se
-autodescribe** —`case_id` en `null` es ad-hoc, `stage_state: INGESTED` explica las siete secciones
-ausentes—, así que no hace falta una marca de procedencia además.
+**Los cinco bundles traen §1 y §2, y los cinco vienen del catálogo.** El bundle se autodescribe
+—`stage_state` explica qué secciones faltan y por qué— así que no hace falta una marca de
+procedencia además.
 
-**Los ejecutados son la muestra, no los 94, y eso no es provisional**: §2 sobre un caso con iOS son
-**nueve celdas por revisión** y minutos u horas de Gradle. La corrida completa es el paso 11.
+**Son cinco y no 94, y eso no es provisional**: §2 sobre un caso con iOS son **nueve celdas por
+revisión** y minutos u horas de Gradle. La corrida completa es el paso 11. Los cinco respetan el
+reparto del corpus: **tres con la compuerta cerrada** —la columna `updated` colapsa entera a
+`not_reached`, y eso es un fallo, no su ausencia— y **dos que rompen por target**.
 
 Y eso obliga a algo que la app ya tenía que hacer y ahora está probado: **una ficha sin `execution`
 no puede pintarse como un caso a medio hacer.** Su estado dice por qué falta. Si la vista dibujara

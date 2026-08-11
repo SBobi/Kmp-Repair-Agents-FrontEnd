@@ -1,6 +1,6 @@
 # Especificación funcional — visor de Case Bundles
 
-**Estado: los pasos 0, 1 y 2 implementados; del 3 en adelante, backlog.** Este documento sigue el
+**Estado: los pasos 0, 1, 2 y 3 implementados; del 4 en adelante, backlog.** Este documento sigue el
 [roadmap del pipeline](../../Kmp-Repair-Agents/docs/roadmap.md): cada paso de allá tiene aquí su
 vista, y el paso no se considera hecho hasta que esa vista existe y se mira
 ([ADR 0008](../../Kmp-Repair-Agents/docs/decisions/0008-every-step-verified-by-ui.md)).
@@ -110,15 +110,16 @@ ni omitidas en silencio. Dentro:
 secciones siguientes "no alcanzadas". Si la ficha lo pinta como un caso normal a medio hacer, el
 atajo está mal implementado.
 
-*Y desde el paso 3b hay además un caso ad-hoc de verdad.* `kmp-repair ingest --git` emite la misma
-ficha leyendo git en vez del catálogo, y el índice lo trae al lado del mismo caso venido de los 94:
-**mismos bumps, y `catalog_origin`, `licence` y `catalog_contrast` ausentes**. Es lo que va a
-producir un repositorio que nunca estuvo en el corpus, y hasta ahora solo se ejercitaba con
-fixtures escritos a mano — que prueban que la vista dibuja lo que le escribimos, no lo que el
-pipeline emite.
+*Y desde el 2026-08-11 el índice son CINCO casos ejecutados de verdad, y nada más.* §1 desde el
+catálogo y §2 con Gradle real, sobre repositorios reales. Los fixtures, el caso ad-hoc y los 94 con
+§1 sola **se quitaron a propósito**: lo que se mira ahora es evidencia medida, no la forma del
+contrato ilustrada con datos inventados. Cada uno se regenera con una línea (README).
 
-*Y desde el 2026-08-11 la ficha se mira contra los 94, no contra dos fixtures.* §1 corre sobre el
-catálogo entero sin red ni builds, así que el índice trae 97 casos y la ficha se ejercita contra
+**Lo que eso cuesta, dicho para que no se descubra**: ya no se puede mirar §1 sobre los 94 —19
+repos, las 4 discrepancias de `catalog_contrast`— ni la comparación ad-hoc contra catálogo del paso
+3b. Las dos garantías siguen comprobadas en el pipeline; lo que se pierde es poder mirarlas.
+
+*Antes de eso, la ficha se ejercitó contra
 formas reales: los 13 multi-bump, los 5 con `reference-update`, el que mezcla una versión con dos
 punteros de submódulo. Es la lección de la campaña de minado aplicada tres pasos antes — y ya
 cobró: un check de frontera daba por hecho que todo bundle trae `execution`, y se rompió al llegar

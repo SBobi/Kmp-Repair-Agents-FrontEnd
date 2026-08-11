@@ -12,11 +12,15 @@ Importa un JSON y lo dibuja — mismo contrato que
 ## Estado
 
 **Dos vistas: `/#/domain` y la ficha de caso.** El dominio —las tres máquinas, las aristas entre
-niveles y la taxonomía— y **97 casos**: los 94 del corpus con §1, dos
-fixtures con §1 y §2, y **un caso ad-hoc que salió de git**, no de una columna.
-Todo desde el dump, ninguna cifra escrita a mano. Los 94 llegan con `stage_state: INGESTED` y sus
-otras siete secciones marcadas «no alcanzada» — §2 necesita Gradle real, que es el paso 3c. El
-ad-hoc es el mismo caso que uno de los 94 y por eso vale: mismos bumps, y sin catálogo detrás.
+niveles y la taxonomía— y **cinco casos ejecutados de verdad**: §1 desde el catálogo y §2 con
+Gradle real, sobre repositorios reales del corpus. Ninguna cifra escrita a mano y **ninguna ficha
+inventada**.
+
+Los cinco respetan el reparto del corpus: **tres tienen la compuerta de configuración cerrada en
+`updated`** —la columna colapsa entera, y eso es un fallo, no su ausencia— y **dos rompen por
+target**, con celdas rojas en `compile`, `compile-test` y `test-run`. Ese último nivel el corpus lo
+tiene en cero medidos: la campaña de minado solo compiló.
+
 La app se construye en paralelo al pipeline, una vista por paso: ver
 [docs/spec.md](docs/spec.md) y el
 [roadmap del pipeline](../Kmp-Repair-Agents/docs/roadmap.md).
@@ -40,18 +44,34 @@ Un comando del pipeline emite el artefacto; esta app lo importa. Son **cuatro ar
 ```bash
 cd ../Kmp-Repair-Agents
 F=../Kmp-Repair-Agents-FrontEnd/data
-kmp-repair schema-dump                     > $F/schema.json
+kmp-repair schema-dump > $F/schema.json
+python3 scripts/probe_execution_against_catalog.py \
+    --case-id 10 --case-id 15 --case-id 32 --case-id 39 --case-id 61 \
+    --dump $F/executed.json
+```
+
+El segundo **compila de verdad**: son minutos u horas, no un comando barato. Y estos otros cuatro
+archivos vivieron acá y se quitaron a propósito —lo que se mira ahora es evidencia medida, no la
+forma del contrato ilustrada con datos inventados—; cada uno se regenera con una línea si hiciera
+falta volver a mirarlo:
+
+```bash
 kmp-repair demo --fixture worked_case      > $F/bundle.worked_case.json
 kmp-repair demo --fixture no_failure_case  > $F/bundle.no_failure_case.json
 kmp-repair ingest                          > $F/corpus.json   # §1 sobre los 94, sin red
 kmp-repair ingest --git Oztechan/CCC@0d8bee72..94fb90fc > $F/bundle.adhoc_case.json
 ```
 
-**Los cinco se versionan**: sin ellos `npm run build` no pasa el type-check en un clone limpio, y
-un dump estático es el mejor fixture posible. `corpus.json` y el ad-hoc se regeneran con un
-comando; el primero **no depende de red** —`dependency_diff` es una columna del catálogo—, pero sí de que
-`data/corpus/model_input_v1.db` esté copiado a mano en el repo del pipeline (ADR 0001). El ad-hoc
-tampoco usa red, pero sí los mirrors bare de la campaña de minado.
+**Los dos se versionan**: sin ellos `npm run build` no pasa el type-check en un clone limpio, y un
+dump estático es el mejor fixture posible. `executed.json` **no se regenera con un comando barato**:
+pide los mirrors de la campaña, los JDK, red para que Gradle resuelva plugins, y horas de build.
+Por eso se versiona con más razón que ninguno.
+
+**Lo que se perdió al dejar solo los cinco, dicho para que no se descubra**: la vista de §1 sobre
+los 94 —19 repos, las 4 discrepancias de `catalog_contrast`— y la comparación del caso ad-hoc
+contra el del catálogo, que cerraba el paso 3b. Las dos garantías **siguen comprobadas en el
+pipeline** (`scripts/contrast_git_with_catalog.py` y `tests/adapters/test_local_git.py`); lo que ya
+no se puede es mirarlas acá.
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
 [docs/data-contract.md](docs/data-contract.md). Qué lo produce y por qué contiene eso, en el repo

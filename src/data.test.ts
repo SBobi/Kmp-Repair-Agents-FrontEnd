@@ -5,12 +5,10 @@ import { describe, expect, it } from "vitest";
 import {
   SUPPORTED_SCHEMA_VERSION,
   SchemaContractError,
-  adhoc,
   bundleFor,
   bundles,
   checkBundle,
   checkSchema,
-  corpus,
   rowOf,
   schema,
 } from "./data";
@@ -101,28 +99,42 @@ describe("la guarda del aviso experimental — probada rompiéndola", () => {
   });
 });
 
-describe("los dos fixtures dicen cosas distintas a propósito", () => {
-  it("worked_case llega a EXECUTED con el texto de error real y un ⊘ que no es fallo", () => {
-    const bundle = bundleFor("acme/kmp-sample@0d8bee72..94fb90fc")!;
-    expect(bundle.stage_state).toBe("EXECUTED");
-    expect(bundle.execution!.build_errors).toContain("Unresolved reference");
-    const ios = bundle.execution!.probes.filter((p) => p.target === "ios");
-    expect(ios.every((p) => p.status === "environment_unavailable")).toBe(true);
+describe("los cinco ejecutados de verdad", () => {
+  // **Todo lo que se afirma acá es sobre evidencia medida.** Antes convivían dos fixtures con
+  // `ScriptedRunner`, un caso ad-hoc y los 94 con §1 sola; se fueron a propósito. Lo que se pierde
+  // —§1 sobre los 94, y el contraste ad-hoc contra catálogo— sigue comprobado en el pipeline.
+
+  it("son cinco, los cinco del catálogo, y los cinco llegaron a EXECUTED", () => {
+    expect(bundles).toHaveLength(5);
+    for (const bundle of bundles) {
+      expect(bundle.case_id).not.toBeNull();
+      expect(bundle.stage_state).toBe("EXECUTED");
+      expect(bundle.execution).not.toBeNull();
+    }
   });
 
-  it("no_failure_case es NO_REPAIR_NEEDED, no un caso a medias", () => {
-    const bundle = bundleFor("acme/kmp-quiet@aaaaaaa..bbbbbbb")!;
-    expect(bundle.stage_state).toBe("NO_REPAIR_NEEDED");
-    expect(bundle.execution!.failures).toEqual([]);
+  it("respetan el reparto del corpus: tres con la compuerta cerrada y dos que rompen por target", () => {
+    // 37 y 57 sobre los 94. Una muestra mitad y mitad probaría los dos mecanismos por igual y
+    // describiría otro corpus.
+    const cerrada = bundles.filter((b) => b.execution!.configuration_evaluates.updated === false);
+    expect(cerrada).toHaveLength(3);
+    expect(bundles.length - cerrada.length).toBe(2);
+  });
+
+  it("con la compuerta cerrada la columna COLAPSA entera, y eso es un fallo, no su ausencia", () => {
+    // Los 37 rompen igual que los 57: rompen antes. Leer «ninguna celda roja» como «nada que
+    // reparar» marcaría el 39,4 % del corpus como no reproducido.
+    for (const bundle of bundles) {
+      if (bundle.execution!.configuration_evaluates.updated !== false) continue;
+      const updated = bundle.execution!.probes.filter((p) => p.revision === "updated");
+      expect(updated.length).toBeGreaterThan(0);
+      expect(updated.every((p) => p.status === "not_reached")).toBe(true);
+      expect(bundle.stage_state).toBe("EXECUTED");
+    }
   });
 
   it("la matriz tiene las mismas filas en las dos revisiones: el plan sale de base", () => {
-    // Solo los que tienen §2. Los 94 del corpus no la tienen y eso es correcto: sobre ellos
-    // corrió §1 sola. Este test daba por hecho que todos la traían, y lo pilló al llegar el
-    // corpus — que es exactamente para lo que sirve mirar datos reales en vez de dos fixtures.
-    const withExecution = bundles.filter((b) => b.execution !== null);
-    expect(withExecution.length).toBeGreaterThan(0);
-    for (const bundle of withExecution) {
+    for (const bundle of bundles) {
       const rows = (revision: string) =>
         new Set(
           bundle
@@ -132,84 +144,59 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
       expect([...rows("updated")].sort()).toEqual([...rows("base")].sort());
     }
   });
-});
 
-describe("los 94 del corpus", () => {
-  // **Se toman por procedencia, no por `case_id !== null`.** Ese filtro decía «vino del catálogo»
-  // y se estaba usando como si dijera «tiene §1 sola» — cierto de `corpus.json` y falso en cuanto
-  // un caso del catálogo se ejecute de verdad. Es la segunda vez que el atajo falla: ya pasó con
-  // `execution` cuando llegaron los 94.
+  it("los cuatro niveles aparecen, y `link` solo en iOS", () => {
+    // ADR 0035: target y nivel son dos ejes. `link` es un paso de toolchain de Apple y no existe
+    // en Android; que apareciera ahí sería una fila inventada.
+    const celdas = bundles.flatMap((b) => b.execution!.probes);
+    expect(new Set(celdas.map((p) => p.level))).toEqual(
+      new Set(["compile", "compile-test", "link", "test-run"]),
+    );
+    for (const probe of celdas.filter((p) => p.level === "link")) {
+      expect(probe.target).toBe("ios");
+    }
+  });
 
-  it("todos traen catalog_origin y licence, y ningún fixture los trae", () => {
-    // Es procedencia y CONTRASTE, no evidencia: por eso vive fuera de `execution`.
-    for (const bundle of corpus) {
-      expect(bundle.catalog_origin).not.toBeNull();
+  it("hay un rojo de `test-run`, que es el nivel que el corpus tiene en cero medidos", () => {
+    // La campaña de minado solo compiló. Es evidencia nueva, sin nada del catálogo contra qué
+    // validarla — y por eso `probe_diff` no la contrasta.
+    const testRun = bundles.flatMap((b) =>
+      b.execution!.probes.filter((p) => p.level === "test-run"),
+    );
+    expect(testRun.some((p) => p.status === "red")).toBe(true);
+  });
+
+  it("el contraste con el catálogo se persiste coincida o no, y sus huecos son del catálogo", () => {
+    for (const bundle of bundles) {
+      expect(bundle.execution!.probe_diff).not.toBeNull();
+    }
+    // Ninguna línea es un desacuerdo de RESULTADO: todas dicen que al catálogo le falta la fila.
+    // Es el hallazgo 4, y por eso no se ajusta la regla para que coincida.
+    const lineas = bundles.flatMap((b) => b.execution!.probe_diff ?? []);
+    expect(lineas.length).toBeGreaterThan(0);
+    for (const linea of lineas) expect(linea).toContain("el catálogo no lo trae");
+  });
+
+  it("cada caso trae su procedencia y su licencia: vienen del catálogo", () => {
+    for (const bundle of bundles) {
       expect(bundle.catalog_origin!.case_id).toBe(bundle.case_id);
+      expect(bundle.catalog_origin!.corpus_sha256).toMatch(/^[0-9a-f]{64}$/);
       expect(bundle.licence!.spdx).not.toBe("");
-      // El texto de licencia servido por el sitio llega con el paso 11, no ahora.
-      expect(bundle.licence!.local_text_sha256).toBeNull();
-    }
-    for (const bundle of [...adhoc, ...bundles.filter((b) => b.case_id === null)]) {
-      expect(bundle.catalog_origin).toBeNull();
     }
   });
 
-  it("el catálogo NO trae texto de error, solo un booleano", () => {
-    // Por eso build_errors no puede existir sin correr un build: es el hueco que §2 cierra.
-    for (const bundle of corpus)
-      for (const probe of bundle.catalog_origin!.probes)
-        expect(typeof probe.has_parseable_error).toBe("boolean");
-  });
-
-  it("son 94, en 19 repos, y ninguno de ESE archivo pasa de INGESTED", () => {
-    // La afirmación es sobre `corpus.json`, que es §1 sola. **No sobre «todo caso con case_id»**:
-    // un caso del catálogo ejecutado de verdad tiene `case_id` y llega a EXECUTED.
-    expect(corpus).toHaveLength(94);
-    expect(new Set(corpus.map((b) => b.case_key.split("@")[0])).size).toBe(19);
-    expect(new Set(corpus.map((b) => b.stage_state))).toEqual(new Set(["INGESTED"]));
-  });
-
-  it("el contraste con el catálogo se persiste, coincida o no", () => {
-    // Tres estados: `null` es «no se comparó», y los fixtures ad-hoc son los únicos así.
-    for (const bundle of corpus) expect(bundle.update!.catalog_contrast).not.toBeNull();
-    expect(corpus.filter((b) => b.update!.catalog_contrast!.agrees === false)).toHaveLength(4);
-    for (const bundle of bundles.filter((b) => b.case_id === null))
-      expect(bundle.update!.catalog_contrast).toBeNull();
-    for (const bundle of adhoc) expect(bundle.update!.catalog_contrast).toBeNull();
-  });
-
-  it("el caso ad-hoc y el del catálogo dibujan el mismo §1 sobre el mismo caso", () => {
-    // El criterio de cierre del paso 3b, del lado de la vista. El ad-hoc salió de `git diff` y
-    // el otro de la columna `dependency_diff`: si la ficha se viera distinta, la vista estaría
-    // mostrando de dónde vino el dato en vez de qué dice.
-    const adhoc = bundles.find((b) => b.case_key === "Oztechan/CCC@0d8bee72..94fb90fc")!;
-    const fromCatalog = bundles.find((b) => b.case_key === adhoc.resolved_key)!;
-    expect(adhoc.update!.bumps).toEqual(fromCatalog.update!.bumps);
-    // Y lo que sí cambia, que es justo lo que la vista tiene que saber pintar como ausencia:
-    // sin catálogo no hay procedencia, ni licencia, ni contraste. Ninguno es un cero.
-    expect(adhoc.case_id).toBeNull();
-    expect(adhoc.catalog_origin).toBeNull();
-    expect(adhoc.licence).toBeNull();
-    expect(adhoc.update!.catalog_contrast).toBeNull();
-    expect(fromCatalog.update!.catalog_contrast!.agrees).toBe(true);
-  });
-
-  it("ninguna lista de bumps sale vacía, y ninguno usa la forma #pr", () => {
-    // `model_input` no tiene columna `pr_number`: los 94 llevan siempre @base..head.
-    for (const bundle of corpus) {
-      expect(bundle.update!.bumps.length).toBeGreaterThan(0);
-      expect(bundle.case_key).not.toContain("#");
+  it("el log crudo de las DOS revisiones llega al almacén, no solo el de updated", () => {
+    // El de base es el que decide qué observación es `preexisting`. Sin él, ese rol queda escrito
+    // en la ficha sin nada contra qué auditarlo.
+    for (const bundle of bundles) {
+      expect(bundle.execution!.raw_log_ref).toMatch(/^[0-9a-f]{64}$/);
+      expect(bundle.execution!.base_log_ref).toMatch(/^[0-9a-f]{64}$/);
     }
   });
 
-  it("una ficha sin §2 no puede pintarse como un caso a medio hacer", () => {
-    // Su estado es INGESTED y eso EXPLICA las siete secciones ausentes. Si la vista las
-    // dibujara vacías sin decir por qué, un caso no ejecutado y uno roto se verían igual.
-    for (const bundle of corpus) {
-      expect(bundle.execution).toBeNull();
-      expect(bundle.blocked).toBeNull();
-      expect(bundle.runs).toEqual([]);
-    }
+  it("bundleFor encuentra por la llave resuelta", () => {
+    expect(bundleFor(bundles[0].case_key)!.case_id).toBe(bundles[0].case_id);
+    expect(bundleFor("no/existe@aaaaaaa..bbbbbbb")).toBeUndefined();
   });
 });
 

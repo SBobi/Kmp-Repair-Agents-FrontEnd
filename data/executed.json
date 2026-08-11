@@ -1,0 +1,1160 @@
+[
+  {
+    "schema_version": 1,
+    "generated_at": "2026-08-11T17:56:14+00:00",
+    "pipeline_git_sha": "25be0dc8f6b82784a90bf8b75bfffeb1c66b472c",
+    "case_key": "prof18/RSS-Parser@f5d3df8df8895643b55f57b2066b416c4e42fd16..ff3179ebb9246e92623a5c70bd3578ae679b9b43",
+    "resolved_key": "prof18/RSS-Parser@f5d3df8df8895643b55f57b2066b416c4e42fd16..ff3179ebb9246e92623a5c70bd3578ae679b9b43",
+    "case_id": 61,
+    "stage_state": "EXECUTED",
+    "blocked": null,
+    "update": {
+      "bumps": [
+        {
+          "label": "android-gradle-plugin",
+          "from": "8.13.2",
+          "to": "9.2.1",
+          "file": "gradle/libs.versions.toml",
+          "update_kind": "plugin-toolchain"
+        }
+      ],
+      "base_sha": "f5d3df8df8895643b55f57b2066b416c4e42fd16",
+      "head_sha": "ff3179ebb9246e92623a5c70bd3578ae679b9b43",
+      "primary_bump": null,
+      "catalog_contrast": {
+        "agrees": true,
+        "detail": null
+      }
+    },
+    "execution": {
+      "probes": [
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "51311c4cc6ce057ad0ddf424ba24554bd538905cdc9f3beec37985a2084ebcd2"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "3feb9f367f2f774eb54f1cb7672fcfb73058de90ec4cca29299de41d2cac8bbf"
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "c9c08f3388008052aaf391b3b1fd62277d01ce8b3cec80c803060fcf039808ce"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "3ce2782afa932f4ff80bc199a59bca1e92a2ec7d0a1155f5ddd1922da68acc84"
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "16f5b521a1bcc0275251903382ec5cb03c40345c0575984d2ed199f7f1e3039d"
+        },
+        {
+          "target": "ios",
+          "level": "link",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "02951acc01f9aff33c404223aba1d0122cab44f1643b0d84c46036eb0d092a70"
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "2187d68581b55171c6bebd3ce0d973cfce860b5c51ebd2c30ace700a69ff44db"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "68497b7572974e003b597233ecd6203d896a1b2f589b5f61ab3b79ee182ae772"
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "2b351766e64da5e4d60abf567b2692111790d68adab3f6df2ff4a2bcad64035a"
+        },
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "link",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        }
+      ],
+      "failures": [
+        {
+          "message": "e: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-61/rssparser/build.gradle.kts:3:34: Unresolved reference 'androidLibrary'.",
+          "entity": "'androidLibrary'.",
+          "parser_id": "kotlin-unresolved-reference",
+          "causal_role": "primary"
+        }
+      ],
+      "build_errors": "e: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-61/rssparser/build.gradle.kts:3:34: Unresolved reference 'androidLibrary'.\n\nFAILURE: Build failed with an exception.\n\n* Where:\nBuild file '/Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-61/rssparser/build.gradle.kts' line: 3\n\n* What went wrong:\nScript compilation errors:\n\n  Line 03: import com.android.build.api.dsl.androidLibrary\n                                            ^ Unresolved reference 'androidLibrary'.\n\n  Line 25:     androidLibrary {\n               ^ 'fun KotlinMultiplatformExtension.androidLibrary(configure: Action<DeprecatedKotlinMultiplatformAndroidLibraryTarget>): Unit' is deprecated. The 'androidLibrary' block is deprecated. Please use 'android' instead.\n\n  Line 40:     macosX64()\n               ^ 'fun macosX64(): KotlinNativeTargetWithHostTests' is deprecated. Target is no longer available. See: https://kotl.in/native-targets-tiers.\n\n  Line 43:     tvosX64()\n               ^ 'fun tvosX64(): KotlinNativeTargetWithSimulatorTests' is deprecated. Target is no longer available. See: https://kotl.in/native-targets-tiers.\n\n  Line 48:     watchosX64()\n               ^ 'fun watchosX64(): KotlinNativeTargetWithSimulatorTests' is deprecated. Target is no longer available. See: https://kotl.in/native-targets-tiers.\n\n5 errors\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 4s\n",
+      "configuration_evaluates": {
+        "base": true,
+        "updated": false
+      },
+      "raw_log_ref": "2eacb8af24713e38323cee70ffd8f9fc01eb5b2380db9e1fd9c644c530fd142b",
+      "base_log_ref": "1c0fe39e7bfb4afed1fb21872e4e6e77d2bba6b0dd788747e8fbe277d9ce0245",
+      "probe_diff": [
+        "android-test/base: acá green, el catálogo no lo trae",
+        "ios-test/base: acá green, el catálogo no lo trae"
+      ]
+    },
+    "dynamic": null,
+    "structural": null,
+    "runs": [],
+    "catalog_origin": {
+      "corpus_version": "v1",
+      "corpus_sha256": "40c4febe9d71b51ac3b53e7419b6d7b62125821c2a6facfa1a0429a7515247ff",
+      "case_id": 61,
+      "repository": "prof18/RSS-Parser",
+      "base_commit_date": "2026-03-22T14:18:09+01:00",
+      "environment_fingerprint": {
+        "jdk_version": 17
+      },
+      "requirements": {
+        "jdk_version": 17,
+        "jdk_env_var": "JAVA_HOME",
+        "gradle_wrapper": "9.4.1",
+        "kotlin": "2.3.20",
+        "android_gradle_plugin": null,
+        "uses_cocoapods": false,
+        "has_git_submodules": false,
+        "needs_android_sdk": true,
+        "needs_xcode": true
+      },
+      "dependency_change": {
+        "label": "android-gradle-plugin",
+        "from": "8.13.2",
+        "to": "9.2.1",
+        "source": "diff"
+      },
+      "probes": [
+        {
+          "target": "android",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "configuration",
+          "stage": "updated",
+          "status": "red",
+          "has_parseable_error": true,
+          "jdk_version": 17
+        },
+        {
+          "target": "ios",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "shared",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        }
+      ],
+      "repair_signal": {
+        "broken_targets": [
+          "configuration"
+        ],
+        "broken_families": [
+          "configuration"
+        ],
+        "base_green_targets": [
+          "android",
+          "ios",
+          "shared"
+        ]
+      }
+    },
+    "licence": {
+      "spdx": "Apache-2.0",
+      "resolved_at": "f5d3df8df8895643b55f57b2066b416c4e42fd16",
+      "url": "https://github.com/prof18/RSS-Parser/blob/f5d3df8df8895643b55f57b2066b416c4e42fd16/LICENSE",
+      "local_text": null,
+      "local_text_sha256": null
+    },
+    "warning": null
+  },
+  {
+    "schema_version": 1,
+    "generated_at": "2026-08-11T17:57:04+00:00",
+    "pipeline_git_sha": "25be0dc8f6b82784a90bf8b75bfffeb1c66b472c",
+    "case_key": "dokar3/sheets@02729dcda31259452d2398f2a4ac79469f931c87..f91c2c58c68c7569ed4f0a8f2c088cbbdda39ac4",
+    "resolved_key": "dokar3/sheets@02729dcda31259452d2398f2a4ac79469f931c87..f91c2c58c68c7569ed4f0a8f2c088cbbdda39ac4",
+    "case_id": 32,
+    "stage_state": "EXECUTED",
+    "blocked": null,
+    "update": {
+      "bumps": [
+        {
+          "label": "agp",
+          "from": "8.4.2",
+          "to": "8.5.0",
+          "file": "gradle/libs.versions.toml",
+          "update_kind": "plugin-toolchain"
+        }
+      ],
+      "base_sha": "02729dcda31259452d2398f2a4ac79469f931c87",
+      "head_sha": "f91c2c58c68c7569ed4f0a8f2c088cbbdda39ac4",
+      "primary_bump": null,
+      "catalog_contrast": {
+        "agrees": true,
+        "detail": null
+      }
+    },
+    "execution": {
+      "probes": [
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "e8f8a4f2752e0a59ffec3eed8280f21ea3f4e8396a22f564454f565b6699574b"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "7131eb99101e766a2f4219d4a0b9df480379ef259641a6a1a4a48e03c425e9ea"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "f02b3fedb547764d2ac700b75570d2749d4e92db66ebde54064d0f83307a26c5"
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "a2b01223a1f2df8774c5b3c6684f2a610f48faa66a6bfcedd4a6223af656abcd"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "91c01da584a24219e9886247c81c982bca9363f39fda73be16576b685544f8a0"
+        },
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        }
+      ],
+      "failures": [],
+      "build_errors": "\nFAILURE: Build failed with an exception.\n\n* Where:\nBuild file '/Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-32/sample/build.gradle.kts' line: 4\n\n* What went wrong:\nAn exception occurred applying plugin request [id: 'com.android.application', version: '8.5.0']\n> Failed to apply plugin 'com.android.internal.version-check'.\n   > Minimum supported Gradle version is 8.7. Current version is 8.6. If using the gradle wrapper, try editing the distributionUrl in /Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-32/gradle/wrapper/gradle-wrapper.properties to gradle-8.7-all.zip\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 1s\n",
+      "configuration_evaluates": {
+        "base": true,
+        "updated": false
+      },
+      "raw_log_ref": "6af441454286ec166162cd938eea525f1d933eb8d7e93ab97ede0b6c0bcab1c4",
+      "base_log_ref": "098464d3e51cf71415880bddecf5c941fa9fa87cd030cb6586abb33ab5f8d483",
+      "probe_diff": []
+    },
+    "dynamic": null,
+    "structural": null,
+    "runs": [],
+    "catalog_origin": {
+      "corpus_version": "v1",
+      "corpus_sha256": "40c4febe9d71b51ac3b53e7419b6d7b62125821c2a6facfa1a0429a7515247ff",
+      "case_id": 32,
+      "repository": "dokar3/sheets",
+      "base_commit_date": "2024-06-13T21:21:31+08:00",
+      "environment_fingerprint": {
+        "jdk_version": 17
+      },
+      "requirements": {
+        "jdk_version": 17,
+        "jdk_env_var": "JAVA_HOME",
+        "gradle_wrapper": "8.6",
+        "kotlin": "2.0.0",
+        "android_gradle_plugin": "8.4.2",
+        "uses_cocoapods": false,
+        "has_git_submodules": false,
+        "needs_android_sdk": true,
+        "needs_xcode": false
+      },
+      "dependency_change": {
+        "label": "agp",
+        "from": "8.4.2",
+        "to": "8.5.0",
+        "source": "diff"
+      },
+      "probes": [
+        {
+          "target": "android",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "android-test",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "configuration",
+          "stage": "updated",
+          "status": "red",
+          "has_parseable_error": true,
+          "jdk_version": 17
+        },
+        {
+          "target": "shared",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        }
+      ],
+      "repair_signal": {
+        "broken_targets": [
+          "configuration"
+        ],
+        "broken_families": [
+          "configuration"
+        ],
+        "base_green_targets": [
+          "android",
+          "android-test",
+          "shared"
+        ]
+      }
+    },
+    "licence": {
+      "spdx": "Apache-2.0",
+      "resolved_at": "02729dcda31259452d2398f2a4ac79469f931c87",
+      "url": "https://github.com/dokar3/sheets/blob/02729dcda31259452d2398f2a4ac79469f931c87/LICENSE.txt",
+      "local_text": null,
+      "local_text_sha256": null
+    },
+    "warning": null
+  },
+  {
+    "schema_version": 1,
+    "generated_at": "2026-08-11T17:58:49+00:00",
+    "pipeline_git_sha": "25be0dc8f6b82784a90bf8b75bfffeb1c66b472c",
+    "case_key": "Oztechan/CCC@f896cc910862b38b4b728de45a08e88ee1283929..804e4df00e24fcd64098cb1467a885d2af33d1a0",
+    "resolved_key": "Oztechan/CCC@f896cc910862b38b4b728de45a08e88ee1283929..804e4df00e24fcd64098cb1467a885d2af33d1a0",
+    "case_id": 15,
+    "stage_state": "EXECUTED",
+    "blocked": null,
+    "update": {
+      "bumps": [
+        {
+          "label": "distributionUrl",
+          "from": "8.2.1",
+          "to": "8.3",
+          "file": "gradle/wrapper/gradle-wrapper.properties",
+          "update_kind": "plugin-toolchain"
+        }
+      ],
+      "base_sha": "f896cc910862b38b4b728de45a08e88ee1283929",
+      "head_sha": "804e4df00e24fcd64098cb1467a885d2af33d1a0",
+      "primary_bump": null,
+      "catalog_contrast": {
+        "agrees": true,
+        "detail": null
+      }
+    },
+    "execution": {
+      "probes": [
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "256d19fff6e3c0a0eb8498a8ff4513c6f58f67d0376757722dd3f5e638a7ea99"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "4ad03d1d9da04d0f8de18ba6c6f55cdcd77ecf23b2f4e6b56b3454cd067f98d1"
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "ad67ad19179f0e011029e8816596d9ead859df5469d77c65b940b9122db12816"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "c41b3517deb380c1c339f0e9fe20661a8464c53f406ffb0cca23d4a46b49cb89"
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "8c8ccf49cc2123e25989504b51b06b0df8c45d1759521320da09a3bfbc521697"
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "03041d31347045c0d13bd23b2e3b1f9c285a1007a3e515a9e806456c6e73d7de"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "b10b5c1bcaee1b2898ceaa355a20dce7b4e85eaff73b252719e13a542eb56a44"
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "base",
+          "status": "red",
+          "raw_log_ref": "8e4e24dfbe123ad2a6b60feb600bfe4e4d352d54fbe6dc458606ad4cdbf25947"
+        },
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "shared",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "not_reached",
+          "raw_log_ref": null
+        }
+      ],
+      "failures": [],
+      "build_errors": "w: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-15/CCC.gradle.kts:62:67: 'getter for buildDir: File!' is deprecated. Deprecated in Java\n\nFAILURE: Build failed with an exception.\n\n* Where:\nBuild file '/Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-15/CCC.gradle.kts' line: 62\n\n* What went wrong:\nScript compilation error:\n\n  Line 62:                 it.file.relativeTo(projectDir).startsWith(project.buildDir.relativeTo(projectDir))\n                                                                             ^ 'getter for buildDir: File!' is deprecated. Deprecated in Java\n\n1 error\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights.\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 7s\n",
+      "configuration_evaluates": {
+        "base": true,
+        "updated": false
+      },
+      "raw_log_ref": "e3ad7ae5d86a522a2be690fb88e7653e0c71ea351c19faf679142feba664b7f7",
+      "base_log_ref": "83ab7e18b08a273e18dc415602c414ed334dfe341da40d82d35daae872928ab1",
+      "probe_diff": []
+    },
+    "dynamic": null,
+    "structural": null,
+    "runs": [],
+    "catalog_origin": {
+      "corpus_version": "v1",
+      "corpus_sha256": "40c4febe9d71b51ac3b53e7419b6d7b62125821c2a6facfa1a0429a7515247ff",
+      "case_id": 15,
+      "repository": "Oztechan/CCC",
+      "base_commit_date": "2023-08-19T16:50:54+02:00",
+      "environment_fingerprint": {
+        "jdk_version": 17
+      },
+      "requirements": {
+        "jdk_version": 17,
+        "jdk_env_var": "JAVA_HOME",
+        "gradle_wrapper": "8.2.1",
+        "kotlin": "1.9.0",
+        "android_gradle_plugin": "8.1.0",
+        "uses_cocoapods": true,
+        "has_git_submodules": true,
+        "needs_android_sdk": true,
+        "needs_xcode": true
+      },
+      "dependency_change": {
+        "label": "distributionUrl",
+        "from": "8.2.1",
+        "to": "8.3",
+        "source": "diff"
+      },
+      "probes": [
+        {
+          "target": "android",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "android-test",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "configuration",
+          "stage": "updated",
+          "status": "red",
+          "has_parseable_error": true,
+          "jdk_version": 17
+        },
+        {
+          "target": "ios",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "ios-test",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "shared",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        }
+      ],
+      "repair_signal": {
+        "broken_targets": [
+          "configuration"
+        ],
+        "broken_families": [
+          "configuration"
+        ],
+        "base_green_targets": [
+          "android",
+          "android-test",
+          "ios",
+          "ios-test",
+          "shared"
+        ]
+      }
+    },
+    "licence": {
+      "spdx": "Apache-2.0",
+      "resolved_at": "f896cc910862b38b4b728de45a08e88ee1283929",
+      "url": "https://github.com/Oztechan/CCC/blob/f896cc910862b38b4b728de45a08e88ee1283929/LICENSE",
+      "local_text": null,
+      "local_text_sha256": null
+    },
+    "warning": null
+  },
+  {
+    "schema_version": 1,
+    "generated_at": "2026-08-11T18:00:59+00:00",
+    "pipeline_git_sha": "25be0dc8f6b82784a90bf8b75bfffeb1c66b472c",
+    "case_key": "meshtastic/Meshtastic-Android@a4148c952d74222ad9b17a50ce0dc4361a7de447..c86bd3b633677fc05f9c61390b973ba8a3da29f1",
+    "resolved_key": "meshtastic/Meshtastic-Android@a4148c952d74222ad9b17a50ce0dc4361a7de447..c86bd3b633677fc05f9c61390b973ba8a3da29f1",
+    "case_id": 39,
+    "stage_state": "EXECUTED",
+    "blocked": null,
+    "update": {
+      "bumps": [
+        {
+          "label": "kotlin",
+          "from": "2.2.21",
+          "to": "2.3.0",
+          "file": "gradle/libs.versions.toml",
+          "update_kind": "plugin-toolchain"
+        }
+      ],
+      "base_sha": "a4148c952d74222ad9b17a50ce0dc4361a7de447",
+      "head_sha": "c86bd3b633677fc05f9c61390b973ba8a3da29f1",
+      "primary_bump": null,
+      "catalog_contrast": {
+        "agrees": true,
+        "detail": null
+      }
+    },
+    "execution": {
+      "probes": [
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "799b9c0b87e378e4fd38397e2f6e2c771ded403c5fc6b5969430044ca419d647"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "36b600d351e3482a3bdd9013a82567f31dbbdf6f8a6c62cec6020e74202ee930"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "9923a1490bb8ae78343d21646084bb86bd0d8ebe271d5ca503a92fdaa254d3ac"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "906516ac570e81cae71587b9f98cfd1a0d0065fb9368046619465b5543354b8d"
+        },
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "799b9c0b87e378e4fd38397e2f6e2c771ded403c5fc6b5969430044ca419d647"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "36b600d351e3482a3bdd9013a82567f31dbbdf6f8a6c62cec6020e74202ee930"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "red",
+          "raw_log_ref": "0e5d2d33dd328b2e7a518801118b4b9333ee5ba969d36de2dccbcc1767c2f042"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "906516ac570e81cae71587b9f98cfd1a0d0065fb9368046619465b5543354b8d"
+        }
+      ],
+      "failures": [],
+      "build_errors": "\n$ [shared compile] ./gradlew core:strings:compileKotlinMetadata\nVersion code offset: 29314197\n\n$ [android compile] ./gradlew app:compileFdroidDebugKotlin\nVersion code offset: 29314197\n\n$ [android compile-test] ./gradlew app:compileFdroidDebugAndroidTestKotlin\nVersion code offset: 29314197\nerror: [Hilt] Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0. To support newer versions, update the kotlin-metadata-jvm library.: java.lang.IllegalArgumentException: Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0. To support newer versions, update the kotlin-metadata-jvm library.\n  \tat kotlin.metadata.jvm.internal.JvmReadUtils.throwIfNotCompatible$kotlin_metadata_jvm(JvmReadUtils.kt:95)\n  \tat kotlin.metadata.jvm.internal.JvmReadUtils.checkMetadataVersionForRead(JvmReadUtils.kt:84)\n  \tat kotlin.metadata.jvm.internal.JvmReadUtils.readMetadataImpl$kotlin_metadata_jvm(JvmReadUtils.kt:46)\n  \tat kotlin.metadata.jvm.KotlinClassMetadata$Companion.readStrict(KotlinClassMetadata.kt:398)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.kotlin.KmClassContainer$Companion.createFor(KotlinClassMetadataUtils.kt:182)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.kotlinMetadata_delegate$lambda$2(JavacTypeElement.kt:57)\n  \tat kotlin.SynchronizedLazyImpl.getValue(LazyJVM.kt:83)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.getKotlinMetadata(JavacTypeElement.kt:57)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.isCompanionObject(JavacTypeElement.kt:118)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement._declaredMethods_delegate$lambda$25(JavacTypeElement.kt:157)\n  \tat kotlin.SynchronizedLazyImpl.getValue(LazyJVM.kt:83)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.get_declaredMethods(JavacTypeElement.kt:154)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.getDeclaredMethods(JavacTypeElement.kt:189)\n  \tat dagger.hilt.processor.internal.Processors.requiresModuleInstance(Processors.java:420)\n  \tat dagger.hilt.processor.internal.root.RootMetadata.daggerCanConstruct(RootMetadata.java:184)\n  \tat dagger.hilt.processor.internal.root.RootMetadata.lambda$modulesThatDaggerCannotConstruct$0(RootMetadata.java:122)\n  \tat java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:178)\n  \tat java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:1024)\n  \tat java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)\n  \tat java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\n  \tat java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\n  \tat java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\n  \tat java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\n  \tat dagger.hilt.processor.internal.root.RootMetadata.modulesThatDaggerCannotConstruct(RootMetadata.java:124)\n  \tat dagger.hilt.processor.internal.root.RootMetadata.validate(RootMetadata.java:149)\n  \tat dagger.hilt.processor.internal.root.RootMetadata.create(RootMetadata.java:52)\n  \tat dagger.hilt.processor.internal.root.ComponentTreeDepsProcessingStep.processComponentTreeDeps(ComponentTreeDepsProcessingStep.java:135)\n  \tat dagger.hilt.processor.internal.root.ComponentTreeDepsProcessingStep.postProcess(ComponentTreeDepsProcessingStep.java:83)\n  \tat dagger.hilt.processor.internal.BaseProcessingStep.postRoundProcess(BaseProcessingStep.java:97)\n  \tat dagger.hilt.processor.internal.JavacBaseProcessingStepProcessor.postRound(JavacBaseProcessingStepProcessor.java:73)\n  \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacBasicAnnotationProcessor.process(JavacBasicAnnotationProcessor.kt:76)\n  \tat org.gradle.api.internal.tasks.compile.processing.DelegatingProcessor.process(DelegatingProcessor.java:62)\n  \tat org.gradle.api.internal.tasks.compile.processing.IsolatingProcessor.process(IsolatingProcessor.java:50)\n  \tat org.gradle.api.internal.tasks.compile.processing.DelegatingProcessor.process(DelegatingProcessor.java:62)\n  \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.access$401(TimeTrackingProcessor.java:38)\n  \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor$5.create(TimeTrackingProcessor.java:100)\n  \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor$5.create(TimeTrackingProcessor.java:97)\n  \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.track(TimeTrackingProcessor.java:118)\n  \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.process(TimeTrackingProcessor.java:97)\n  \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.callProcessor(JavacProcessingEnvironment.java:1021)\n  \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.discoverAndRunProcs(JavacProcessingEnvironment.java:937)\n  \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment$Round.run(JavacProcessingEnvironment.java:1265)\n  \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.doProcessing(JavacProcessingEnvironment.java:1380)\n  \tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.processAnnotations(JavaCompiler.java:1272)\n  \tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:946)\n  \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.lambda$doCall$0(JavacTaskImpl.java:104)\n  \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.invocationHelper(JavacTaskImpl.java:152)\n  \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.doCall(JavacTaskImpl.java:100)\n  \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.call(JavacTaskImpl.java:94)\n  \tat org.gradle.internal.compiler.java.IncrementalCompileTask.call(IncrementalCompileTask.java:92)\n  \tat org.gradle.api.internal.tasks.compile.AnnotationProcessingCompileTask.call(AnnotationProcessingCompileTask.java:94)\n  \tat org.gradle.api.internal.tasks.compile.ResourceCleaningCompilationTask.call(ResourceCleaningCompilationTask.java:57)\n  \tat org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:83)\n  \tat org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)\n  \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)\n  \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)\n  \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)\n  \tat org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)\n  \tat org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)\n  \tat org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)\n  \tat org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)\n  \tat org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)\n  \tat org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$3(JavaCompile.java:206)\n  \tat org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)\n  \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:55)\n  \tat org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)\n  \tat org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)\n  \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)\n  \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)\n  \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:64)\n  \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:48)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n  \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:48)\n  \tat org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:224)\n  \tat org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:165)\n  \tat org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:150)\n  \tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n  \tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n  \tat org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)\n  \tat org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)\n  \tat org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)\n  \tat org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)\n  \tat org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:237)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:220)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:203)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:170)\n  \tat org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)\n  \tat org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)\n  \tat org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)\n  \tat org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n  \tat org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)\n  \tat org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)\n  \tat org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)\n  \tat org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)\n  \tat org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)\n  \tat org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)\n  \tat org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)\n  \tat org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:68)\n  \tat org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:38)\n  \tat org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)\n  \tat org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)\n  \tat org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)\n  \tat org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)\n  \tat org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:39)\n  \tat org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:28)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)\n  \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)\n  \tat org.gradle.internal.Try$Success.map(Try.java:170)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)\n  \tat org.gradle.internal.Either$Left.fold(Either.java:116)\n  \tat org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)\n  \tat org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)\n  \tat org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)\n  \tat org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)\n  \tat org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)\n  \tat org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)\n  \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n  \tat org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)\n  \tat org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)\n  \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)\n  \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)\n  \tat org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)\n  \tat org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)\n  \tat org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)\n  \tat org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)\n  \tat org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:64)\n  \tat org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:35)\n  \tat org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:62)\n  \tat org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:40)\n  \tat org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:76)\n  \tat org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:45)\n  \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:136)\n  \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:66)\n  \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:38)\n  \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)\n  \tat org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)\n  \tat org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)\n  \tat org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)\n  \tat org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)\n  \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)\n  \tat org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:297)\n  \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)\n  \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)\n  \tat org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)\n  \tat org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)\n  \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)\n  \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n  \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)\n  \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)\n  \tat org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)\n  \tat org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)\n  \tat org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:44)\n  \tat org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:31)\n  \tat org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)\n  \tat org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)\n  \tat org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)\n  \tat org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)\n  \tat org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)\n  \tat org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)\n  \tat org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)\n  \tat org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)\n  \tat org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)\n  \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)\n  \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)\n  \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n  \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n  \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)\n  \tat org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)\n  \tat org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)\n  \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)\n  \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)\n  \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)\n  \tat org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)\n  \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)\n  \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)\n  \tat org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)\n  \tat org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)\n  \tat org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)\n  \tat org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)\n  \tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\n  \tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\n  \tat java.base/java.lang.Thread.run(Thread.java:1583)\n  \n  \u001b[1;31m[Hilt] Processing did not complete. See error above for details.\u001b[0m\n1 error\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':app:hiltJavaCompileFdroidDebug'.\n> Compilation failed; see the compiler output below.\n  error: [Hilt] Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0. To support newer versions, update the kotlin-metadata-jvm library.: java.lang.IllegalArgumentException: Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0. To support newer versions, update the kotlin-metadata-jvm library.\n    \tat kotlin.metadata.jvm.internal.JvmReadUtils.throwIfNotCompatible$kotlin_metadata_jvm(JvmReadUtils.kt:95)\n    \tat kotlin.metadata.jvm.internal.JvmReadUtils.checkMetadataVersionForRead(JvmReadUtils.kt:84)\n    \tat kotlin.metadata.jvm.internal.JvmReadUtils.readMetadataImpl$kotlin_metadata_jvm(JvmReadUtils.kt:46)\n    \tat kotlin.metadata.jvm.KotlinClassMetadata$Companion.readStrict(KotlinClassMetadata.kt:398)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.kotlin.KmClassContainer$Companion.createFor(KotlinClassMetadataUtils.kt:182)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.kotlinMetadata_delegate$lambda$2(JavacTypeElement.kt:57)\n    \tat kotlin.SynchronizedLazyImpl.getValue(LazyJVM.kt:83)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.getKotlinMetadata(JavacTypeElement.kt:57)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.isCompanionObject(JavacTypeElement.kt:118)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement._declaredMethods_delegate$lambda$25(JavacTypeElement.kt:157)\n    \tat kotlin.SynchronizedLazyImpl.getValue(LazyJVM.kt:83)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.get_declaredMethods(JavacTypeElement.kt:154)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacTypeElement.getDeclaredMethods(JavacTypeElement.kt:189)\n    \tat dagger.hilt.processor.internal.Processors.requiresModuleInstance(Processors.java:420)\n    \tat dagger.hilt.processor.internal.root.RootMetadata.daggerCanConstruct(RootMetadata.java:184)\n    \tat dagger.hilt.processor.internal.root.RootMetadata.lambda$modulesThatDaggerCannotConstruct$0(RootMetadata.java:122)\n    \tat java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:178)\n    \tat java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:1024)\n    \tat java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)\n    \tat java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)\n    \tat java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)\n    \tat java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)\n    \tat java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:682)\n    \tat dagger.hilt.processor.internal.root.RootMetadata.modulesThatDaggerCannotConstruct(RootMetadata.java:124)\n    \tat dagger.hilt.processor.internal.root.RootMetadata.validate(RootMetadata.java:149)\n    \tat dagger.hilt.processor.internal.root.RootMetadata.create(RootMetadata.java:52)\n    \tat dagger.hilt.processor.internal.root.ComponentTreeDepsProcessingStep.processComponentTreeDeps(ComponentTreeDepsProcessingStep.java:135)\n    \tat dagger.hilt.processor.internal.root.ComponentTreeDepsProcessingStep.postProcess(ComponentTreeDepsProcessingStep.java:83)\n    \tat dagger.hilt.processor.internal.BaseProcessingStep.postRoundProcess(BaseProcessingStep.java:97)\n    \tat dagger.hilt.processor.internal.JavacBaseProcessingStepProcessor.postRound(JavacBaseProcessingStepProcessor.java:73)\n    \tat dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.JavacBasicAnnotationProcessor.process(JavacBasicAnnotationProcessor.kt:76)\n    \tat org.gradle.api.internal.tasks.compile.processing.DelegatingProcessor.process(DelegatingProcessor.java:62)\n    \tat org.gradle.api.internal.tasks.compile.processing.IsolatingProcessor.process(IsolatingProcessor.java:50)\n    \tat org.gradle.api.internal.tasks.compile.processing.DelegatingProcessor.process(DelegatingProcessor.java:62)\n    \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.access$401(TimeTrackingProcessor.java:38)\n    \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor$5.create(TimeTrackingProcessor.java:100)\n    \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor$5.create(TimeTrackingProcessor.java:97)\n    \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.track(TimeTrackingProcessor.java:118)\n    \tat org.gradle.api.internal.tasks.compile.processing.TimeTrackingProcessor.process(TimeTrackingProcessor.java:97)\n    \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.callProcessor(JavacProcessingEnvironment.java:1021)\n    \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.discoverAndRunProcs(JavacProcessingEnvironment.java:937)\n    \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment$Round.run(JavacProcessingEnvironment.java:1265)\n    \tat jdk.compiler/com.sun.tools.javac.processing.JavacProcessingEnvironment.doProcessing(JavacProcessingEnvironment.java:1380)\n    \tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.processAnnotations(JavaCompiler.java:1272)\n    \tat jdk.compiler/com.sun.tools.javac.main.JavaCompiler.compile(JavaCompiler.java:946)\n    \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.lambda$doCall$0(JavacTaskImpl.java:104)\n    \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.invocationHelper(JavacTaskImpl.java:152)\n    \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.doCall(JavacTaskImpl.java:100)\n    \tat jdk.compiler/com.sun.tools.javac.api.JavacTaskImpl.call(JavacTaskImpl.java:94)\n    \tat org.gradle.internal.compiler.java.IncrementalCompileTask.call(IncrementalCompileTask.java:92)\n    \tat org.gradle.api.internal.tasks.compile.AnnotationProcessingCompileTask.call(AnnotationProcessingCompileTask.java:94)\n    \tat org.gradle.api.internal.tasks.compile.ResourceCleaningCompilationTask.call(ResourceCleaningCompilationTask.java:57)\n    \tat org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:83)\n    \tat org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)\n    \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)\n    \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)\n    \tat org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)\n    \tat org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)\n    \tat org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)\n    \tat org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)\n    \tat org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)\n    \tat org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)\n    \tat org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$3(JavaCompile.java:206)\n    \tat org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)\n    \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:55)\n    \tat org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)\n    \tat org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)\n    \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)\n    \tat org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)\n    \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:64)\n    \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:48)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n    \tat org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:48)\n    \tat org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:224)\n    \tat org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:165)\n    \tat org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:150)\n    \tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n    \tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n    \tat org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)\n    \tat org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)\n    \tat org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)\n    \tat org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)\n    \tat org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:237)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:220)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:203)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:170)\n    \tat org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)\n    \tat org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)\n    \tat org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)\n    \tat org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n    \tat org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)\n    \tat org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)\n    \tat org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)\n    \tat org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)\n    \tat org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)\n    \tat org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)\n    \tat org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)\n    \tat org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:68)\n    \tat org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:38)\n    \tat org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)\n    \tat org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)\n    \tat org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)\n    \tat org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)\n    \tat org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:39)\n    \tat org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:28)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)\n    \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)\n    \tat org.gradle.internal.Try$Success.map(Try.java:170)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)\n    \tat org.gradle.internal.Either$Left.fold(Either.java:116)\n    \tat org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)\n    \tat org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)\n    \tat org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)\n    \tat org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)\n    \tat org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)\n    \tat org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)\n    \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n    \tat org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)\n    \tat org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)\n    \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)\n    \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)\n    \tat org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)\n    \tat org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)\n    \tat org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)\n    \tat org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)\n    \tat org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:64)\n    \tat org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:35)\n    \tat org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:62)\n    \tat org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:40)\n    \tat org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:76)\n    \tat org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:45)\n    \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:136)\n    \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:66)\n    \tat org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:38)\n    \tat org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)\n    \tat org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)\n    \tat org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)\n    \tat org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)\n    \tat org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)\n    \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)\n    \tat org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:297)\n    \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)\n    \tat org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)\n    \tat org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)\n    \tat org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)\n    \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)\n    \tat java.base/java.util.Optional.orElseGet(Optional.java:364)\n    \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)\n    \tat org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)\n    \tat org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)\n    \tat org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)\n    \tat org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:44)\n    \tat org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:31)\n    \tat org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)\n    \tat org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)\n    \tat org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)\n    \tat org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)\n    \tat org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)\n    \tat org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)\n    \tat org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)\n    \tat org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)\n    \tat org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)\n    \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)\n    \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)\n    \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)\n    \tat org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)\n    \tat org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)\n    \tat org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)\n    \tat org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)\n    \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)\n    \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)\n    \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)\n    \tat org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)\n    \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)\n    \tat org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)\n    \tat org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)\n    \tat org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)\n    \tat org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)\n    \tat org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)\n    \tat java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)\n    \tat java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)\n    \tat java.base/java.lang.Thread.run(Thread.java:1583)\n    \n    \u001b[1;31m[Hilt] Processing did not complete. See error above for details.\u001b[0m\n  1 error\n\n* Try:\n> Check your code and dependencies to fix the compilation error(s)\n\nBUILD FAILED in 12s\n\n$ [android test-run] ./gradlew mesh_service_example:testDebugUnitTest\nVersion code offset: 29314197\n",
+      "configuration_evaluates": {
+        "base": true,
+        "updated": true
+      },
+      "raw_log_ref": "7b16291409f334717930d9253af904d049f081cef2bfbc78bbbf4f4026e549ea",
+      "base_log_ref": "6032cd24862d7143393dc571591436c87d0b431dd40b939b6c4ab53cd365ce69",
+      "probe_diff": []
+    },
+    "dynamic": null,
+    "structural": null,
+    "runs": [],
+    "catalog_origin": {
+      "corpus_version": "v1",
+      "corpus_sha256": "40c4febe9d71b51ac3b53e7419b6d7b62125821c2a6facfa1a0429a7515247ff",
+      "case_id": 39,
+      "repository": "meshtastic/Meshtastic-Android",
+      "base_commit_date": "2025-12-16T22:09:49Z",
+      "environment_fingerprint": {
+        "jdk_version": 21
+      },
+      "requirements": {
+        "jdk_version": 21,
+        "jdk_env_var": "JDK_HOME_21",
+        "gradle_wrapper": "9.2.1",
+        "kotlin": "2.2.21",
+        "android_gradle_plugin": "8.13.2",
+        "uses_cocoapods": false,
+        "has_git_submodules": true,
+        "needs_android_sdk": true,
+        "needs_xcode": false
+      },
+      "dependency_change": {
+        "label": "kotlin",
+        "from": "2.2.21",
+        "to": "2.3.0",
+        "source": "diff"
+      },
+      "probes": [
+        {
+          "target": "android",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 21
+        },
+        {
+          "target": "android",
+          "stage": "updated",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 21
+        },
+        {
+          "target": "android-test",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 21
+        },
+        {
+          "target": "android-test",
+          "stage": "updated",
+          "status": "red",
+          "has_parseable_error": true,
+          "jdk_version": 21
+        },
+        {
+          "target": "shared",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 21
+        },
+        {
+          "target": "shared",
+          "stage": "updated",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 21
+        }
+      ],
+      "repair_signal": {
+        "broken_targets": [
+          "android-test"
+        ],
+        "broken_families": [
+          "android"
+        ],
+        "base_green_targets": [
+          "android",
+          "android-test",
+          "shared"
+        ]
+      }
+    },
+    "licence": {
+      "spdx": "GPL-3.0-or-later",
+      "resolved_at": "a4148c952d74222ad9b17a50ce0dc4361a7de447",
+      "url": "https://github.com/meshtastic/Meshtastic-Android/blob/a4148c952d74222ad9b17a50ce0dc4361a7de447/LICENSE",
+      "local_text": null,
+      "local_text_sha256": null
+    },
+    "warning": null
+  },
+  {
+    "schema_version": 1,
+    "generated_at": "2026-08-11T18:05:19+00:00",
+    "pipeline_git_sha": "25be0dc8f6b82784a90bf8b75bfffeb1c66b472c",
+    "case_key": "LiveFastEatTrashRaccoon/RaccoonForLemmy@30959e94653cdf1b6a8a9a0f08156feefda754df..82eb61a0f3e377eb12c61db2301322273ad02e66",
+    "resolved_key": "LiveFastEatTrashRaccoon/RaccoonForLemmy@30959e94653cdf1b6a8a9a0f08156feefda754df..82eb61a0f3e377eb12c61db2301322273ad02e66",
+    "case_id": 10,
+    "stage_state": "EXECUTED",
+    "blocked": null,
+    "update": {
+      "bumps": [
+        {
+          "label": "multiplatform-markdown-renderer",
+          "from": "0.39.2",
+          "to": "0.40.2",
+          "file": "gradle/libs.versions.toml",
+          "update_kind": "plugin-toolchain"
+        }
+      ],
+      "base_sha": "30959e94653cdf1b6a8a9a0f08156feefda754df",
+      "head_sha": "82eb61a0f3e377eb12c61db2301322273ad02e66",
+      "primary_bump": null,
+      "catalog_contrast": {
+        "agrees": true,
+        "detail": null
+      }
+    },
+    "execution": {
+      "probes": [
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "2fc843b1e011535ea20cad1f280c94947d51e589f405dabf6e5c54396a34f58a"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "cef882c55679d3829299ca7234f2a3aaed8df0ff5ef648990a6785111d87b3e7"
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "98b27f82ed91e7fd6f58cbd700d13e7b6d1d2986ead8768c8c81b387910132f2"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "baa6115befee73167b66fb54ad2583564f38cff5fc2710c2d2bc29b5256ad8a1"
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "242ce9102ebf1c125ce113bf01bb05773417c16ed1a15967747098b4d492500e"
+        },
+        {
+          "target": "ios",
+          "level": "link",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "6b061ee78bbbed4c06785ce5ad07b8ffc2db5e68f80a4ac7627bcb6fe1e2b079"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "950ef80550ecbcdb08e46af901062b6133fb48db2bb0726b5d57fa6a16da1416"
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "base",
+          "status": "green",
+          "raw_log_ref": "283864e17a789ca9eacee276588b80b48352f6a235a383b0098ebc4f382ad911"
+        },
+        {
+          "target": "shared",
+          "level": "compile",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "9241b35c35636b14d1e9fdc2568be8d22842644bd9445d7afd2ed9c71db4dafb"
+        },
+        {
+          "target": "android",
+          "level": "compile",
+          "revision": "updated",
+          "status": "red",
+          "raw_log_ref": "80886175e1440574da01e38b45892c356bc1dde6a6299d2f4abaec49a6e45bcf"
+        },
+        {
+          "target": "ios",
+          "level": "compile",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "b58e1714b631d2c16f2d8af160b6526a3aa6c85d8805bc197c6c7d4868a30528"
+        },
+        {
+          "target": "android",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "red",
+          "raw_log_ref": "c5b8e1675b15e3be219ab861cb682f2d52c8fde4c50710d2de03dd1c97a3e80f"
+        },
+        {
+          "target": "ios",
+          "level": "compile-test",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "242ce9102ebf1c125ce113bf01bb05773417c16ed1a15967747098b4d492500e"
+        },
+        {
+          "target": "ios",
+          "level": "link",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "6b061ee78bbbed4c06785ce5ad07b8ffc2db5e68f80a4ac7627bcb6fe1e2b079"
+        },
+        {
+          "target": "android",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "red",
+          "raw_log_ref": "8683596dfa6e06a902bea91f8a6a2c0cf0280d00f14b8b690e8f0cdd890b5858"
+        },
+        {
+          "target": "ios",
+          "level": "test-run",
+          "revision": "updated",
+          "status": "green",
+          "raw_log_ref": "283864e17a789ca9eacee276588b80b48352f6a235a383b0098ebc4f382ad911"
+        }
+      ],
+      "failures": [
+        {
+          "message": "e: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 None of the following candidates is applicable:",
+          "entity": "None of the following candidates is applicable:",
+          "parser_id": "kotlin-compile-error",
+          "causal_role": "primary"
+        },
+        {
+          "message": "e: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 No value passed for parameter 'node'.",
+          "entity": "No value passed for parameter 'node'.",
+          "parser_id": "kotlin-compile-error",
+          "causal_role": "primary"
+        }
+      ],
+      "build_errors": "\n$ [shared compile] ./gradlew core:api:compileCommonMainKotlinMetadata\n\n$ [android compile] ./gradlew androidApp:compileDebugKotlin\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 None of the following candidates is applicable:\n\nfun MarkdownText(content: String, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: String, node: ASTNode, style: TextStyle, modifier: Modifier = ..., contentChildType: IElementType? = ..., annotatorSettings: AnnotatorSettings = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., extendedSpans: ExtendedSpans? = ...): Unit\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., onTextLayout: ((TextLayoutResult, Color?) -> Unit)?): Unit:\n  No value passed for parameter 'onTextLayout'.\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 No value passed for parameter 'node'.\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':core:markdown:compileAndroidMain'.\n> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork\n   > Compilation error. See log for more details\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 12s\n\n$ [ios compile] ./gradlew core:api:compileKotlinIosSimulatorArm64\n\n$ [android compile-test] ./gradlew androidApp:compileDebugAndroidTestKotlin\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 None of the following candidates is applicable:\n\nfun MarkdownText(content: String, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: String, node: ASTNode, style: TextStyle, modifier: Modifier = ..., contentChildType: IElementType? = ..., annotatorSettings: AnnotatorSettings = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., extendedSpans: ExtendedSpans? = ...): Unit\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., onTextLayout: ((TextLayoutResult, Color?) -> Unit)?): Unit:\n  No value passed for parameter 'onTextLayout'.\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 No value passed for parameter 'node'.\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':core:markdown:compileAndroidMain'.\n> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork\n   > Compilation error. See log for more details\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 12s\n\n$ [ios compile-test] ./gradlew core:api:compileTestKotlinIosSimulatorArm64\n\n$ [ios link] ./gradlew core:api:linkDebugFrameworkIosSimulatorArm64\n\n$ [android test-run] ./gradlew androidApp:testDebugUnitTest\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 None of the following candidates is applicable:\n\nfun MarkdownText(content: String, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: String, node: ASTNode, style: TextStyle, modifier: Modifier = ..., contentChildType: IElementType? = ..., annotatorSettings: AnnotatorSettings = ...): Unit:\n  Argument type mismatch: actual type is 'AnnotatedString', but 'String' was expected.\n\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., extendedSpans: ExtendedSpans? = ...): Unit\nfun MarkdownText(content: AnnotatedString, node: ASTNode, modifier: Modifier = ..., style: TextStyle = ..., onTextLayout: ((TextLayoutResult, Color?) -> Unit)?): Unit:\n  No value passed for parameter 'onTextLayout'.\ne: file:///Users/sbobi/Downloads/TESIS/REPAIR/Kmp-Repair-Agents/workspace/gate/case-10/core/markdown/src/commonMain/kotlin/com/livefast/eattrash/raccoonforlemmy/core/markdown/CustomMarkdownWrapper.kt:332:5 No value passed for parameter 'node'.\n\nFAILURE: Build failed with an exception.\n\n* What went wrong:\nExecution failed for task ':core:markdown:compileAndroidMain'.\n> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.btapi.BuildToolsApiCompilationWork\n   > Compilation error. See log for more details\n\n* Try:\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 12s\n\n$ [ios test-run] ./gradlew core:api:iosSimulatorArm64Test\n",
+      "configuration_evaluates": {
+        "base": true,
+        "updated": true
+      },
+      "raw_log_ref": "775c20a63081731d8e322097766cd8bbaa34286715d84687b2b073f968d1a0cf",
+      "base_log_ref": "2da414376a4ae09b2377f854eecbd82513a8cfe6086964e6d2b6376b15c3ff86",
+      "probe_diff": [
+        "android-test/base: acá green, el catálogo no lo trae",
+        "ios-test/base: acá green, el catálogo no lo trae",
+        "android-test/updated: acá red, el catálogo no lo trae",
+        "ios-test/updated: acá green, el catálogo no lo trae"
+      ]
+    },
+    "dynamic": null,
+    "structural": null,
+    "runs": [],
+    "catalog_origin": {
+      "corpus_version": "v1",
+      "corpus_sha256": "40c4febe9d71b51ac3b53e7419b6d7b62125821c2a6facfa1a0429a7515247ff",
+      "case_id": 10,
+      "repository": "LiveFastEatTrashRaccoon/RaccoonForLemmy",
+      "base_commit_date": "2026-04-06T20:28:11+02:00",
+      "environment_fingerprint": {
+        "jdk_version": 17
+      },
+      "requirements": {
+        "jdk_version": 17,
+        "jdk_env_var": "JAVA_HOME",
+        "gradle_wrapper": "9.3.0",
+        "kotlin": "2.3.20",
+        "android_gradle_plugin": "9.0.0",
+        "uses_cocoapods": false,
+        "has_git_submodules": false,
+        "needs_android_sdk": true,
+        "needs_xcode": true
+      },
+      "dependency_change": {
+        "label": "multiplatform-markdown-renderer",
+        "from": "0.39.2",
+        "to": "0.40.2",
+        "source": "diff"
+      },
+      "probes": [
+        {
+          "target": "android",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "android",
+          "stage": "updated",
+          "status": "red",
+          "has_parseable_error": true,
+          "jdk_version": 17
+        },
+        {
+          "target": "ios",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "ios",
+          "stage": "updated",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "shared",
+          "stage": "base",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        },
+        {
+          "target": "shared",
+          "stage": "updated",
+          "status": "green",
+          "has_parseable_error": false,
+          "jdk_version": 17
+        }
+      ],
+      "repair_signal": {
+        "broken_targets": [
+          "android"
+        ],
+        "broken_families": [
+          "android"
+        ],
+        "base_green_targets": [
+          "android",
+          "ios",
+          "shared"
+        ]
+      }
+    },
+    "licence": {
+      "spdx": "GPL-3.0-only",
+      "resolved_at": "30959e94653cdf1b6a8a9a0f08156feefda754df",
+      "url": "https://github.com/LiveFastEatTrashRaccoon/RaccoonForLemmy/blob/30959e94653cdf1b6a8a9a0f08156feefda754df/LICENSE",
+      "local_text": null,
+      "local_text_sha256": null
+    },
+    "warning": null
+  }
+]

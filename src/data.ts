@@ -5,10 +5,7 @@
 // paso del roadmap, así que acá se falla ruidosamente con uno que esta app no reconoce en vez
 // de renderizar secciones a medias.
 
-import adhocJson from "../data/bundle.adhoc_case.json";
-import noFailureJson from "../data/bundle.no_failure_case.json";
-import workedJson from "../data/bundle.worked_case.json";
-import corpusJson from "../data/corpus.json";
+import executedJson from "../data/executed.json";
 import schemaJson from "../data/schema.json";
 import type { Bundle, Machine, Schema, State, Transition } from "./types";
 
@@ -91,28 +88,25 @@ export function checkBundle(candidate: Bundle): Bundle {
 }
 
 /**
- * Los dos fixtures (§1 + §2), **un caso ad-hoc de verdad** y los 94 del corpus (§1 sola: §2
- * necesita Gradle real). Que convivan no confunde porque el bundle se autodescribe: `case_id`
- * null es ad-hoc.
+ * **Los cinco casos ejecutados de verdad, y nada más.**
  *
- * El ad-hoc no está escrito a mano: lo emite `kmp-repair ingest --git` leyendo git, sin abrir el
- * catálogo (paso 3b). Es el mismo caso que uno de los 94 y **por eso vale**: en la vista se ven
- * los mismos bumps con `catalog_origin` y `catalog_contrast` ausentes, que es lo que un caso que
- * nunca estuvo en el corpus va a producir. Un fixture escrito a mano probaría que la vista dibuja
- * lo que le escribimos; éste prueba que dibuja lo que el pipeline emite.
+ * Salen de `scripts/probe_execution_against_catalog.py --dump`: §1 desde el catálogo y §2 con
+ * Gradle real, sobre repositorios reales del corpus. Ninguno está escrito a mano.
  *
- * **Se exportan por procedencia, no solo concatenados, y eso arregla un defecto real.** Los tests
- * separaban el corpus con `case_id !== null` y luego afirmaban que ninguno pasa de `INGESTED` —
- * que es cierto de `corpus.json` y falso en cuanto un caso del catálogo se ejecute de verdad.
- * `case_id` dice «vino del catálogo», no «tiene §1 sola», y usarlo como si dijera lo segundo
- * funciona hasta que deja de funcionar. Es la segunda vez: ya pasó con `execution` cuando
- * llegaron los 94.
+ * Antes convivían aquí cuatro fuentes —dos fixtures con `ScriptedRunner`, un caso ad-hoc salido de
+ * git, y los 94 del corpus con §1 sola—. Se fueron a propósito: **lo que se mira ahora es evidencia
+ * medida**, no la forma del contrato ilustrada con datos inventados. Las cuatro se regeneran con
+ * un comando cada una (ver el README) si hiciera falta volver a mirarlas.
+ *
+ * **Lo que se pierde, y dónde sigue comprobado**: la vista de §1 sobre los 94 —19 repos, las 4
+ * discrepancias de `catalog_contrast`— y la comparación ad-hoc contra catálogo que cerró el paso
+ * 3b. Las dos garantías siguen vivas en el pipeline (`scripts/contrast_git_with_catalog.py` y
+ * `tests/adapters/test_local_git.py`); lo que ya no se puede es mirarlas acá.
+ *
+ * Los cinco no se eligieron por comodidad: **tres tienen la compuerta de configuración cerrada en
+ * `updated` y dos rompen por target**, que es el reparto del corpus (37 y 57).
  */
-export const fixtures: Bundle[] = [workedJson as Bundle, noFailureJson as Bundle].map(checkBundle);
-export const adhoc: Bundle[] = [adhocJson as Bundle].map(checkBundle);
-export const corpus: Bundle[] = (corpusJson as Bundle[]).map(checkBundle);
-
-export const bundles: Bundle[] = [...fixtures, ...adhoc, ...corpus];
+export const bundles: Bundle[] = (executedJson as unknown as Bundle[]).map(checkBundle);
 
 export function bundleFor(caseKey: string): Bundle | undefined {
   return bundles.find((bundle) => bundle.case_key === caseKey);
