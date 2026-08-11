@@ -100,13 +100,19 @@ export function checkBundle(candidate: Bundle): Bundle {
  * los mismos bumps con `catalog_origin` y `catalog_contrast` ausentes, que es lo que un caso que
  * nunca estuvo en el corpus va a producir. Un fixture escrito a mano probaría que la vista dibuja
  * lo que le escribimos; éste prueba que dibuja lo que el pipeline emite.
+ *
+ * **Se exportan por procedencia, no solo concatenados, y eso arregla un defecto real.** Los tests
+ * separaban el corpus con `case_id !== null` y luego afirmaban que ninguno pasa de `INGESTED` —
+ * que es cierto de `corpus.json` y falso en cuanto un caso del catálogo se ejecute de verdad.
+ * `case_id` dice «vino del catálogo», no «tiene §1 sola», y usarlo como si dijera lo segundo
+ * funciona hasta que deja de funcionar. Es la segunda vez: ya pasó con `execution` cuando
+ * llegaron los 94.
  */
-export const bundles: Bundle[] = [
-  workedJson as Bundle,
-  noFailureJson as Bundle,
-  adhocJson as Bundle,
-  ...(corpusJson as Bundle[]),
-].map(checkBundle);
+export const fixtures: Bundle[] = [workedJson as Bundle, noFailureJson as Bundle].map(checkBundle);
+export const adhoc: Bundle[] = [adhocJson as Bundle].map(checkBundle);
+export const corpus: Bundle[] = (corpusJson as Bundle[]).map(checkBundle);
+
+export const bundles: Bundle[] = [...fixtures, ...adhoc, ...corpus];
 
 export function bundleFor(caseKey: string): Bundle | undefined {
   return bundles.find((bundle) => bundle.case_key === caseKey);

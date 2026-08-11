@@ -30,6 +30,7 @@ falta. Este documento describe el caso:
 | `data/schema.json` | las tres máquinas, sus transiciones **entre niveles**, la taxonomía y los motivos de `UNAVAILABLE` | las constantes del dominio y el sha del pipeline | **sí** — sin él `npm run build` no pasa el type-check en un clone limpio |
 | `data/bundle.<fixture>.json` | un caso, con §1 y §2 | una corrida sobre fixture | **sí, mientras sean fixtures** |
 | `data/corpus.json` | **los 94, con §1 sola** | `kmp-repair ingest` sobre el catálogo | sí — se regenera con un comando y no depende de red |
+| `data/executed.json` | **una muestra con §1 y §2 de verdad** | `scripts/probe_execution_against_catalog.py --dump` | sí — pero **no se regenera con un comando**: son horas de Gradle real |
 
 `schema.json` **no lleva `generated_at` a propósito**: no depende de cuándo se corrió, así que un
 timestamp solo produciría un diff en cada regeneración sobre un contenido idéntico. La procedencia
@@ -65,11 +66,15 @@ que rechace sin aviso, que acepte con él, y que hoy no dispare sola. Una guarda
 disparar y que nadie perturba no avisaría de un error de tipeo en el camino de acceso hasta el paso
 7 — cuando ya no serviría.
 
-**Y los bundles llegan en dos formas, con dos grados de completitud, a propósito.** Los fixtures
-traen §1 y §2; los 94 del corpus traen **§1 sola**, porque §2 necesita Gradle real. La app los
-concatena y el índice los muestra juntos: **el bundle se autodescribe** —`case_id` en `null` es
-ad-hoc, `stage_state: INGESTED` explica las siete secciones ausentes—, así que no hace falta una
-marca de procedencia además.
+**Y los bundles llegan en tres formas, con tres grados de completitud, a propósito.** Los fixtures
+traen §1 y §2 con `ScriptedRunner`; los 94 del corpus traen **§1 sola**, porque §2 necesita Gradle
+real; y `executed.json` trae **una muestra de casos reales con §2 medida**, con probes de verdad en
+los cuatro niveles. La app los concatena y el índice los muestra juntos: **el bundle se
+autodescribe** —`case_id` en `null` es ad-hoc, `stage_state: INGESTED` explica las siete secciones
+ausentes—, así que no hace falta una marca de procedencia además.
+
+**Los ejecutados son la muestra, no los 94, y eso no es provisional**: §2 sobre un caso con iOS son
+**nueve celdas por revisión** y minutos u horas de Gradle. La corrida completa es el paso 11.
 
 Y eso obliga a algo que la app ya tenía que hacer y ahora está probado: **una ficha sin `execution`
 no puede pintarse como un caso a medio hacer.** Su estado dice por qué falta. Si la vista dibujara

@@ -5,10 +5,12 @@ import { describe, expect, it } from "vitest";
 import {
   SUPPORTED_SCHEMA_VERSION,
   SchemaContractError,
+  adhoc,
   bundleFor,
   bundles,
   checkBundle,
   checkSchema,
+  corpus,
   rowOf,
   schema,
 } from "./data";
@@ -133,7 +135,10 @@ describe("los dos fixtures dicen cosas distintas a propósito", () => {
 });
 
 describe("los 94 del corpus", () => {
-  const corpus = bundles.filter((b) => b.case_id !== null);
+  // **Se toman por procedencia, no por `case_id !== null`.** Ese filtro decía «vino del catálogo»
+  // y se estaba usando como si dijera «tiene §1 sola» — cierto de `corpus.json` y falso en cuanto
+  // un caso del catálogo se ejecute de verdad. Es la segunda vez que el atajo falla: ya pasó con
+  // `execution` cuando llegaron los 94.
 
   it("todos traen catalog_origin y licence, y ningún fixture los trae", () => {
     // Es procedencia y CONTRASTE, no evidencia: por eso vive fuera de `execution`.
@@ -144,7 +149,7 @@ describe("los 94 del corpus", () => {
       // El texto de licencia servido por el sitio llega con el paso 11, no ahora.
       expect(bundle.licence!.local_text_sha256).toBeNull();
     }
-    for (const bundle of bundles.filter((b) => b.case_id === null)) {
+    for (const bundle of [...adhoc, ...bundles.filter((b) => b.case_id === null)]) {
       expect(bundle.catalog_origin).toBeNull();
     }
   });
@@ -156,7 +161,9 @@ describe("los 94 del corpus", () => {
         expect(typeof probe.has_parseable_error).toBe("boolean");
   });
 
-  it("son 94, en 19 repos, y ninguno pasa de INGESTED", () => {
+  it("son 94, en 19 repos, y ninguno de ESE archivo pasa de INGESTED", () => {
+    // La afirmación es sobre `corpus.json`, que es §1 sola. **No sobre «todo caso con case_id»**:
+    // un caso del catálogo ejecutado de verdad tiene `case_id` y llega a EXECUTED.
     expect(corpus).toHaveLength(94);
     expect(new Set(corpus.map((b) => b.case_key.split("@")[0])).size).toBe(19);
     expect(new Set(corpus.map((b) => b.stage_state))).toEqual(new Set(["INGESTED"]));
@@ -168,6 +175,7 @@ describe("los 94 del corpus", () => {
     expect(corpus.filter((b) => b.update!.catalog_contrast!.agrees === false)).toHaveLength(4);
     for (const bundle of bundles.filter((b) => b.case_id === null))
       expect(bundle.update!.catalog_contrast).toBeNull();
+    for (const bundle of adhoc) expect(bundle.update!.catalog_contrast).toBeNull();
   });
 
   it("el caso ad-hoc y el del catálogo dibujan el mismo §1 sobre el mismo caso", () => {
