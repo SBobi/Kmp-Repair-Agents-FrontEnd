@@ -1,0 +1,413 @@
+{
+  "schema_version": 1,
+  "pipeline_git_sha": "2a8339380250c130bd25459c34e81438e57c802d",
+  "machines": [
+    {
+      "name": "CaseState",
+      "column": "case.stage_state",
+      "covers": "§1-§4 — lo determinista, corrido UNA vez y compartido por los cuatro modos",
+      "states": [
+        {
+          "name": "CREATED",
+          "kind": "initial"
+        },
+        {
+          "name": "INGESTED",
+          "kind": "progress"
+        },
+        {
+          "name": "MATERIALIZED",
+          "kind": "progress"
+        },
+        {
+          "name": "EXECUTED",
+          "kind": "progress"
+        },
+        {
+          "name": "MODELED",
+          "kind": "terminal"
+        },
+        {
+          "name": "NOT_REPRODUCED",
+          "kind": "exit"
+        },
+        {
+          "name": "NO_REPAIR_NEEDED",
+          "kind": "exit"
+        },
+        {
+          "name": "UNAVAILABLE",
+          "kind": "unavailable"
+        }
+      ],
+      "transitions": [
+        {
+          "source": "CREATED",
+          "target": "INGESTED",
+          "stage": "§1",
+          "condition": "el caso resolvió a dos revisiones y el diff de build files quedó tipado"
+        },
+        {
+          "source": "INGESTED",
+          "target": "MATERIALIZED",
+          "stage": "§2",
+          "condition": "el clone pesado existe en disco — frontera fina a propósito: deja descartar un caso antes de pagarlo"
+        },
+        {
+          "source": "MATERIALIZED",
+          "target": "EXECUTED",
+          "stage": "§2",
+          "condition": "build y test corridos en base y en updated, por target y por nivel"
+        },
+        {
+          "source": "EXECUTED",
+          "target": "MODELED",
+          "stage": "§4",
+          "condition": "updated expone un fallo accionable y el árbol de impacto está construido"
+        },
+        {
+          "source": "EXECUTED",
+          "target": "NOT_REPRODUCED",
+          "stage": "§2",
+          "condition": "updated NO expone fallo Y el caso vino del catálogo — los 94 rompen por selección, así que esto es un HALLAZGO sobre el corpus (ADR 0014)"
+        },
+        {
+          "source": "EXECUTED",
+          "target": "NO_REPAIR_NEEDED",
+          "stage": "§2",
+          "condition": "updated NO expone fallo y el caso es ad-hoc — el único de los dos que es un resultado legítimo (ADR 0014)"
+        },
+        {
+          "source": "CREATED",
+          "target": "UNAVAILABLE",
+          "stage": "§1-§4",
+          "condition": "no pudimos traerlo o ejecutarlo — nunca un fallo de reparación, nunca en un denominador (ADR 0012)"
+        },
+        {
+          "source": "INGESTED",
+          "target": "UNAVAILABLE",
+          "stage": "§1-§4",
+          "condition": "no pudimos traerlo o ejecutarlo — nunca un fallo de reparación, nunca en un denominador (ADR 0012)"
+        },
+        {
+          "source": "MATERIALIZED",
+          "target": "UNAVAILABLE",
+          "stage": "§1-§4",
+          "condition": "no pudimos traerlo o ejecutarlo — nunca un fallo de reparación, nunca en un denominador (ADR 0012)"
+        },
+        {
+          "source": "EXECUTED",
+          "target": "UNAVAILABLE",
+          "stage": "§1-§4",
+          "condition": "no pudimos traerlo o ejecutarlo — nunca un fallo de reparación, nunca en un denominador (ADR 0012)"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "CREATED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "INGESTED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "MATERIALIZED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "EXECUTED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        }
+      ]
+    },
+    {
+      "name": "RunState",
+      "column": "run.state",
+      "covers": "§5-§8 — una por (caso, modo), y las cuatro están AISLADAS entre sí (ADR 0033)",
+      "states": [
+        {
+          "name": "STARTED",
+          "kind": "initial"
+        },
+        {
+          "name": "LOCALIZED",
+          "kind": "progress"
+        },
+        {
+          "name": "NO_SAFE_PATCH",
+          "kind": "exit"
+        },
+        {
+          "name": "UNAVAILABLE",
+          "kind": "unavailable"
+        },
+        {
+          "name": "EVALUATED",
+          "kind": "terminal"
+        }
+      ],
+      "transitions": [
+        {
+          "source": "STARTED",
+          "target": "LOCALIZED",
+          "stage": "§5",
+          "condition": "SOLO el modo 4: el agente purgó el árbol en una lista rankeada"
+        },
+        {
+          "source": "STARTED",
+          "target": "NO_SAFE_PATCH",
+          "stage": "§6",
+          "condition": "ABSTENCIÓN: el agente decidió que no hay nada que proponer. No es que no entregara nada usable —eso es fallo de modelo y se cuenta aparte— ni agotar las tres vueltas en rojo (ADR 0029 §9)"
+        },
+        {
+          "source": "LOCALIZED",
+          "target": "NO_SAFE_PATCH",
+          "stage": "§6",
+          "condition": "la misma abstención en el modo 4 — su tasa se publica por modo, así que el estado de origen tiene que existir en los cuatro (ADR 0030)"
+        },
+        {
+          "source": "STARTED",
+          "target": "EVALUATED",
+          "stage": "§8",
+          "condition": "modos 1-3, y los run con mode = null: la vuelta que trae is_final cierra la corrida"
+        },
+        {
+          "source": "LOCALIZED",
+          "target": "EVALUATED",
+          "stage": "§8",
+          "condition": "modo 4: ídem, la vuelta con is_final"
+        },
+        {
+          "source": "NO_SAFE_PATCH",
+          "target": "EVALUATED",
+          "stage": "§8",
+          "condition": "la abstención también se explica: lleva un attempt de turn = 0 con solo explanation (ADR 0025)"
+        },
+        {
+          "source": "STARTED",
+          "target": "UNAVAILABLE",
+          "stage": "§5-§8",
+          "condition": "un proveedor caído deja indisponible ESE MODO, no el caso (ADR 0012, enmienda del 2026-08-08)"
+        },
+        {
+          "source": "LOCALIZED",
+          "target": "UNAVAILABLE",
+          "stage": "§5-§8",
+          "condition": "un proveedor caído deja indisponible ESE MODO, no el caso (ADR 0012, enmienda del 2026-08-08)"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "STARTED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "LOCALIZED",
+          "stage": null,
+          "condition": "permanent = false: se re-ingresa al estado que registra blocked.stage"
+        },
+        {
+          "source": "UNAVAILABLE",
+          "target": "EVALUATED",
+          "stage": null,
+          "condition": "permanent = true: cierra SIN pasar por §8 — su blocked ya lleva stage, reason, permanent y el message crudo, y pagar una llamada por reescribir un campo no es explicar (ADR 0025)"
+        }
+      ]
+    },
+    {
+      "name": "AttemptState",
+      "column": "attempt.state",
+      "covers": "una por vuelta — ACÁ vive el lazo, y hasta tres vueltas (ADR 0029)",
+      "states": [
+        {
+          "name": "PATCHED",
+          "kind": "initial"
+        },
+        {
+          "name": "VALIDATED",
+          "kind": "progress"
+        },
+        {
+          "name": "EXPLAINED",
+          "kind": "terminal"
+        }
+      ],
+      "transitions": [
+        {
+          "source": "PATCHED",
+          "target": "VALIDATED",
+          "stage": "§7",
+          "condition": "se probó de verdad: build de TODOS los targets, tests y DroidBot. VALIDATED es el estado; FULL_FIX/REGRESSED es el outcome, y son ejes distintos"
+        },
+        {
+          "source": "VALIDATED",
+          "target": "EXPLAINED",
+          "stage": "§8",
+          "condition": "el artefacto existe — con la prosa, o con la prosa marcada como ausente"
+        },
+        {
+          "source": "EXPLAINED",
+          "target": "PATCHED",
+          "stage": "§6",
+          "condition": "EL LAZO: §7 dio rojo y quedan vueltas. Lo decide §7, nunca §8, que corre antes de que exista la vuelta siguiente (ADR 0029)"
+        }
+      ]
+    }
+  ],
+  "level_transitions": [
+    {
+      "source_machine": "CaseState",
+      "source_state": "MODELED",
+      "target_machine": "RunState",
+      "target_state": "STARTED",
+      "cardinality": "1 → 4",
+      "condition": "una corrida por modo, y las cuatro parten de la MISMA fila `case`. Eso es lo que hace que una diferencia entre modos sea del modo (ADR 0028 §1)"
+    },
+    {
+      "source_machine": "CaseState",
+      "source_state": "NOT_REPRODUCED",
+      "target_machine": "RunState",
+      "target_state": "STARTED",
+      "cardinality": "1 → 1",
+      "condition": "UNA sola corrida con mode = null: ningún modo lo intentó. Cuatro copias del mismo número inflarían el denominador de cada modo"
+    },
+    {
+      "source_machine": "CaseState",
+      "source_state": "NO_REPAIR_NEEDED",
+      "target_machine": "RunState",
+      "target_state": "STARTED",
+      "cardinality": "1 → 1",
+      "condition": "ídem: mode = null, y aun así pasa por §8 porque es un hallazgo que hay que narrar (ADR 0025)"
+    },
+    {
+      "source_machine": "RunState",
+      "source_state": "STARTED",
+      "target_machine": "AttemptState",
+      "target_state": "PATCHED",
+      "cardinality": "1 → 1..3",
+      "condition": "vuelta 1, y hasta tres. Cada vuelta arrastra TRES secciones —patch, validación y prosa—, por eso es una fila y no un elemento de array (ADR 0030)"
+    },
+    {
+      "source_machine": "RunState",
+      "source_state": "NO_SAFE_PATCH",
+      "target_machine": "AttemptState",
+      "target_state": "EXPLAINED",
+      "cardinality": "1 → 1",
+      "condition": "un attempt de turn = 0, sin synthesis y sin validation: entra DIRECTO en EXPLAINED. Es la segunda puerta de entrada de esta máquina, y la misma forma que toma un run con mode = null"
+    },
+    {
+      "source_machine": "AttemptState",
+      "source_state": "EXPLAINED",
+      "target_machine": "RunState",
+      "target_state": "EVALUATED",
+      "cardinality": "1 → 1",
+      "condition": "SOLO la vuelta que trae is_final — verde, o era la tercera. Un caso marcado como terminado que sigue corriendo es una contradicción que después nadie sabe leer"
+    }
+  ],
+  "modes": [
+    {
+      "name": "raw_error",
+      "ordinal": 1
+    },
+    {
+      "name": "context_rich",
+      "ordinal": 2
+    },
+    {
+      "name": "iterative_agentic",
+      "ordinal": 3
+    },
+    {
+      "name": "full_pipeline",
+      "ordinal": 4
+    }
+  ],
+  "taxonomy": [
+    {
+      "kind": "direct",
+      "what": "una coordenada de dependencia declarada cambia de versión",
+      "file": "build.gradle.kts",
+      "diff": "-    implementation(\"io.insert-koin:koin-core:3.5.6\")\n+    implementation(\"io.insert-koin:koin-core:4.0.0\")",
+      "source": "sintético",
+      "versioned": true
+    },
+    {
+      "kind": "plugin-toolchain",
+      "what": "entrada de version catalog o bloque de plugins — AGP, Kotlin, KSP",
+      "file": "gradle/libs.versions.toml",
+      "diff": "-androidGradlePlugin = \"8.1.2\"\n+androidGradlePlugin = \"8.1.3\"",
+      "source": "Oztechan/CCC#2960",
+      "versioned": true
+    },
+    {
+      "kind": "platform-integration",
+      "what": "Xcode, SPM, framework: artefactos de integración con Apple",
+      "file": "iosApp/iosApp.xcodeproj/project.pbxproj",
+      "diff": "-    IPHONEOS_DEPLOYMENT_TARGET = 14.1;\n+    IPHONEOS_DEPLOYMENT_TARGET = 15.0;",
+      "source": "sintético",
+      "versioned": true
+    },
+    {
+      "kind": "reference-update",
+      "what": "cambia una REFERENCIA, no una versión: puntero de submódulo, digest, ref fijada. `from`/`to` son shas, así que §7 no puede ordenarlos y anota downgrade_check: SKIPPED",
+      "file": "submodule/basemob",
+      "diff": "-Subproject commit f30c8b7\n+Subproject commit 4a15737",
+      "source": "Oztechan/CCC#2807",
+      "versioned": false
+    },
+    {
+      "kind": "fallback",
+      "what": "el diff no alcanza para clasificar con confianza. Es un resultado EXPLÍCITO, nunca un default silencioso: forzar una etiqueta enrutaría mal más adelante",
+      "file": "gradle/libs.versions.toml",
+      "diff": "-# see https://example.invalid/upgrade-notes\n+# see https://example.invalid/upgrade-notes-2",
+      "source": "sintético",
+      "versioned": false
+    }
+  ],
+  "absent_kinds": [
+    {
+      "name": "transitive",
+      "why": "un update transitivo NO aparece como línea cambiada en un build file: llega por el árbol de dependencias. `classify_update` recibe el diff, así que jamás podría devolverlo — declararla sería una clase muerta. Donde sí aparece es en §5, como un error que nombra un símbolo de una librería que el repo nunca declaró"
+    }
+  ],
+  "blocked_reasons": [
+    {
+      "reason": "REPO_GONE",
+      "permanent": true,
+      "why": "borrado, privatizado o renombrado sin redirección"
+    },
+    {
+      "reason": "SHA_NOT_FOUND",
+      "permanent": true,
+      "why": "el PR fue reescrito; ese commit no vuelve"
+    },
+    {
+      "reason": "HOST_UNREACHABLE",
+      "permanent": false,
+      "why": "red caída, rate-limit, 5xx del host"
+    },
+    {
+      "reason": "CLONE_FAILED",
+      "permanent": false,
+      "why": "timeout, disco, un fetch a medias"
+    },
+    {
+      "reason": "NO_RUNNABLE_TARGET",
+      "permanent": false,
+      "why": "ningún target se puede ejecutar acá, o el build script no evalúa en la revisión base — sin base evaluable no se puede atribuir nada a la actualización"
+    },
+    {
+      "reason": "PROVIDER_UNAVAILABLE",
+      "permanent": false,
+      "why": "el proveedor LLM no responde"
+    }
+  ]
+}

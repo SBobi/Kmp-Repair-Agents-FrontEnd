@@ -1,0 +1,47 @@
+// La frontera de confianza. Los datos se importan, no se piden: sin fetch, y por tanto sin
+// estado de carga, sin estado de error, sin spinner y sin race condition.
+//
+// **Un contrato que se mueve, y una app que lo detecta.** El dump del pipeline crece con cada
+// paso del roadmap, así que acá se falla ruidosamente con uno que esta app no reconoce en vez
+// de renderizar secciones a medias.
+
+import schemaJson from "../data/schema.json";
+import type { Machine, Schema, State, Transition } from "./types";
+
+/** La versión que esta app entiende. Subirla es portar las vistas, no tocar este número. */
+export const SUPPORTED_SCHEMA_VERSION = 1;
+
+export class SchemaContractError extends Error {}
+
+export function checkSchema(candidate: Schema): Schema {
+  if (candidate.schema_version !== SUPPORTED_SCHEMA_VERSION) {
+    throw new SchemaContractError(
+      `schema_version ${candidate.schema_version}: esta app entiende la ${SUPPORTED_SCHEMA_VERSION}. ` +
+        `Regenerar el dump con \`kmp-repair schema-dump\`, o portar la vista.`,
+    );
+  }
+  if (!candidate.pipeline_git_sha) {
+    throw new SchemaContractError("falta pipeline_git_sha: el dump no es trazable a una versión");
+  }
+  const machineNames = new Set(candidate.machines.map((m) => m.name));
+  for (const edge of candidate.level_transitions) {
+    if (!machineNames.has(edge.source_machine) || !machineNames.has(edge.target_machine)) {
+      throw new SchemaContractError(
+        `arista entre niveles hacia una máquina que el dump no trae: ${edge.source_machine} → ${edge.target_machine}`,
+      );
+    }
+  }
+  return candidate;
+}
+
+export const schema: Schema = checkSchema(schemaJson as Schema);
+
+/** Índice de fila de cada estado dentro de su máquina. El orden declarado ES el del layout. */
+export function rowOf(machine: Machine, stateName: string): number {
+  return machine.states.findIndex((state: State) => state.name === stateName);
+}
+
+/** Aristas que la vista dibuja como tramo recto: bajan exactamente una fila. */
+export function isStraight(machine: Machine, transition: Transition): boolean {
+  return rowOf(machine, transition.target) - rowOf(machine, transition.source) === 1;
+}

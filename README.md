@@ -11,8 +11,10 @@ Importa un JSON y lo dibuja — mismo contrato que
 
 ## Estado
 
-**Nada implementado todavía — solo estos documentos.** La app se construye en paralelo al pipeline,
-una vista por paso: ver [docs/spec.md](docs/spec.md) y el
+**Una vista, la del paso 1.** La app levanta, compila y dibuja `/#/domain`: las tres máquinas de
+estados, las aristas entre niveles y la taxonomía, **todo desde el dump**. No hay ninguna ficha de
+caso todavía, porque el pipeline no produce ningún bundle. La app se construye en paralelo al
+pipeline, una vista por paso: ver [docs/spec.md](docs/spec.md) y el
 [roadmap del pipeline](../Kmp-Repair-Agents/docs/roadmap.md).
 
 ## Por qué existe desde el paso 1 y no al final
@@ -29,11 +31,17 @@ contrato del dump**, nunca lo rompe hacia atrás.
 
 ## De dónde salen los datos
 
-Un comando del pipeline emite el artefacto; esta app lo importa:
+Un comando del pipeline emite el artefacto; esta app lo importa. Son **dos archivos, no uno**:
 
 ```bash
-cd ../Kmp-Repair-Agents && kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json
+cd ../Kmp-Repair-Agents
+kmp-repair schema-dump > ../Kmp-Repair-Agents-FrontEnd/data/schema.json   # el dominio
+kmp-repair dump <case-key> > ../Kmp-Repair-Agents-FrontEnd/data/bundle.json  # un caso
 ```
+
+`schema.json` **se versiona** —es función de las constantes del dominio, no de una corrida, y sin
+él `npm run build` no pasa el type-check en un clone limpio—. `bundle.json` no: sale de una corrida
+y se regenera.
 
 Qué contiene y qué garantiza, desde la lectura del consumidor:
 [docs/data-contract.md](docs/data-contract.md). Qué lo produce y por qué contiene eso, en el repo
@@ -45,8 +53,14 @@ cuando el enriquecimiento se fue del visor al pipeline.
 
 ## Correr
 
-Todavía nada que correr. Cuando exista, los comandos serán los mismos que en el front del Mining
-(`npm run dev` / `build` / `preview` / `test`) — ver [docs/stack.md](docs/stack.md).
+```bash
+npm install
+npm run dev       # http://localhost:5173/Kmp-Repair-Agents-FrontEnd/#/domain
+npm run build     # tsc -b + vite build → dist/
+npm test          # vitest run — checks de frontera sobre data.ts
+```
+
+Ver [docs/stack.md](docs/stack.md).
 
 ## Docs
 

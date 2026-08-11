@@ -1,6 +1,6 @@
 # Stack y decisiones
 
-Vite + React + TypeScript, sitio estático. **Nada implementado todavía.** Las decisiones de abajo
+Vite + React + TypeScript, sitio estático. **Implementado el andamiaje y la vista Domain.** Las decisiones de abajo
 no se toman de cero: se **heredan** del front del Mining
 ([su stack.md](../../../MINING/Kmp-Repair-Mining-FrontEnd/docs/stack.md)), que ya las pagó y las
 verificó en navegador. Repetir esa deliberación sería el trabajo más caro y menos útil de este
@@ -52,7 +52,17 @@ acción y no la de la página**.
 es arrastrar una app Angular entera con su toolchain: mucho más código del que evita.
 
 `three.js` es la única dependencia nueva que este repo añade sobre el stack heredado, y entra por
-un requisito que ninguna de las heredadas cubre: 3D.
+un requisito que ninguna de las heredadas cubre: 3D. **Todavía no está instalada**: entra con la
+vista que la necesita, no antes.
+
+**Sin fuente remota, y ésa es la única desviación del stack heredado.**
+El front del Mining trae Darker Grotesque desde `fonts.googleapis.com`. Acá no, y es la misma regla
+que dos párrafos más arriba mata el iframe de CodeCharta: una fuente alojada fuera es **un tercero
+que ve quién abre la página**, en un artefacto que se publica. Que la petición sea de un `.woff2` y
+no de un visor entero no cambia quién queda del otro lado. Pila del sistema (`system-ui`), cero
+peticiones externas, y el CSP de un sitio estático deja de tener excepciones que explicar.
+→ Se revisa si alguna vez hace falta una tipografía que la pila del sistema no dé, y entonces se
+**vendoriza** el `.woff2`, no se enlaza.
 
 **Componentes portados, no reinventados.**
 `ProbeMatrix`, `DiffView` y `ChipGroup` ya existen resueltos en
@@ -83,10 +93,25 @@ niveles.
 → Se reconsidera si aparece una cuarta máquina, o si una flecha tuviera que ir hacia atrás entre
 columnas.
 
+> **Y la segunda mitad de esa condición se disparó al dibujarlo, así que hay que responderla.**
+> `AttemptState.EXPLAINED → RunState.EVALUATED` **va hacia atrás** entre columnas: la vuelta con
+> `is_final` cierra la corrida, que vive una columna a la izquierda.
+>
+> **Sigue alcanzando, y es una sola.** Se rutea por un carril bajo el diagrama —de la base de la
+> caja de origen, a lo ancho, y sube a la de destino— y no cruza ninguna otra arista. Un motor de
+> grafos tendría que aprender que hay tres niveles y que ésa es la única excepción, que es más
+> configuración de la que ahorra. Se reconsidera **si aparece la segunda**.
+
 ## Verificación
 
-Una suite sobre `data.ts`, que es donde vivirá la única lógica no trivial: composición de filtros,
+Una suite sobre `data.ts`, que es donde vive la única lógica no trivial: composición de filtros,
 derivación de facetas, serialización a/desde la URL, y **los checks de frontera** del dump.
+
+**Hoy son ocho, y todos son de frontera**, que es lo que corresponde con un solo artefacto
+importado: que `schema_version` sea la que esta app entiende, que `pipeline_git_sha` esté, que
+ninguna arista entre niveles apunte a una máquina o un estado que el dump no trae, y que la
+taxonomía llegue con sus cinco clases y su ejemplo. Los de filtros y URL entran con la vista que
+los tenga.
 
 La mitad de la suite del Mining son checks de frontera y esa proporción se mantiene aquí: no se
 re-implementa ninguna regla del pipeline, se comprueba que **el archivo recibido es el prometido**.

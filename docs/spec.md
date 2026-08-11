@@ -1,6 +1,6 @@
 # Especificación funcional — visor de Case Bundles
 
-**Estado: nada implementado.** Este documento es el backlog, ordenado por el
+**Estado: los pasos 0 y 1 implementados; del 2 en adelante, backlog.** Este documento sigue el
 [roadmap del pipeline](../../Kmp-Repair-Agents/docs/roadmap.md): cada paso de allá tiene aquí su
 vista, y el paso no se considera hecho hasta que esa vista existe y se mira
 ([ADR 0008](../../Kmp-Repair-Agents/docs/decisions/0008-every-step-verified-by-ui.md)).
@@ -27,14 +27,14 @@ dice que no existe, aquí no se inventa.
 
 Cada bloque: **qué añade el pipeline** → **qué se ve** → **qué queda probado** (y qué lo falsaría).
 
-### Paso 0 — andamiaje
+### Paso 0 — andamiaje · **implementado**
 
 Pipeline: repo, tooling, capas vacías. Aquí: Vite + React + TS, header, router hash, ruta índice
 que dice honestamente "sin bundles todavía".
 
 *Probado:* la app levanta y compila. Falsa si `npm run build` no pasa el type-check.
 
-### Paso 1 — `domain/`: máquina de estados y taxonomía
+### Paso 1 — `domain/`: máquina de estados y taxonomía · **implementado** (`/#/domain`)
 
 Pipeline: entidades del Case Bundle, **tres** máquinas de estados —`CaseState`, `RunState`,
 `AttemptState`— con sus transiciones, las 5 clases de
@@ -53,6 +53,23 @@ clases y un ejemplo de diff por clase.
 *Probado:* que la máquina de estados **es la que se cree que es**. Un estado sin salida, una
 transición que se agregó sin declarar, o el `fallback` de taxonomía ausente se ven en un vistazo —
 cosas que un test unitario también atrapa, pero solo si alguien pensó en escribirlo.
+
+*Cómo quedó, y una cosa que la vista encontró antes que el test.* Tres columnas, SVG a mano, cada
+estado con **glifo además de color**, y debajo la tabla completa de transiciones con la condición
+de cada una — el diagrama para ver la forma, la tabla para leer el porqué sin depender de un
+tooltip. `data.ts` comprueba en la frontera que toda arista nombra estados que el dump declara.
+
+Lo que apareció al dibujarlo: **`UNAVAILABLE` está en dos máquinas**, y `schema.md` decía que
+ninguna comparte un valor. No era un error de este visor sino de esa frase — el ADR 0012 lo
+decidió así en su enmienda del 2026-08-08, y el conteo de dieciséis estados de
+[stack.md](stack.md) solo cuadra contándolo dos veces. Corregido allá; acá queda anotado porque
+es exactamente lo que esta vista existe para producir.
+
+*Y una condición de reversión que se disparó.* [stack.md](stack.md) decía reconsiderar la librería
+de grafos «si una flecha tuviera que ir hacia atrás entre columnas», y
+`AttemptState.EXPLAINED → RunState.EVALUATED` va hacia atrás. **Es una sola**, se rutea por debajo
+sin cruzar nada, y no justifica arrastrar un motor de layout que además no sabe que hay niveles.
+Se reconsidera si aparece la segunda.
 
 ### Paso 2 — slice vertical con fakes: primera ficha de caso
 
