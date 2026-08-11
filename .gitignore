@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+# El dump lo produce el pipeline y se copia a mano — no es un artefacto de este repo.
+data/bundle.json

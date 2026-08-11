@@ -1,0 +1,48 @@
+/* CSS plano con custom properties, un archivo — heredado del front del Mining (stack.md).
+   Los tokens de estado (verde/rojo/gris de las matrices) entran con la primera matriz, en el
+   paso 2: un token sin nada que pintar es una decisión tomada sin el caso delante. */
+
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #5c5c5c;
+  --rule: #d9d9d9;
+  /* Pila del sistema: sin fuente remota. El propio stack.md rechaza el iframe de CodeCharta
+     por meter «un tercero que ve qué caso estás mirando» en un artefacto que se publica, y
+     una fuente alojada fuera es exactamente esa misma petición. */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  line-height: 1.5;
+}
+
+main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+}
+
+.state {
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
